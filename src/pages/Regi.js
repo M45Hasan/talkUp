@@ -144,6 +144,10 @@ const Regi = () => {
           const errorCode = error.code;
           if (errorCode.includes("auth/email-already-in-use")) {
             setError({ ...errorData, email: "Email already exit" });
+            setTimeout(()=>{
+              navigate("/signin")
+
+            },2000)
           }
 
           console.log(errorCode);
