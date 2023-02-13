@@ -11,6 +11,7 @@ import WorkExp from "../component/WorkExp";
 import { TiLocationArrowOutline } from "react-icons/ti";
 import Cropper from "react-cropper";
 import "cropperjs/dist/cropper.css";
+
 import {
   getStorage,
   ref,
@@ -22,6 +23,7 @@ import {
 import { getAuth, updateProfile } from "firebase/auth";
 import { getDatabase, ref as def, set, push, onValue } from "firebase/database";
 import Slide from "../component/Slide";
+import EditProfile from "../component/EditProfile";
 const Profile = () => {
   //############################ state start####
 
@@ -52,6 +54,8 @@ const Profile = () => {
   const [image, setImage] = useState();
   const [show, setShow] = useState(false);
   let [arrShow, setArr] = useState([]);
+  let [profileEdit, setProfileEdit] = useState(false);
+  
 
   const auth = getAuth();
   const db = getDatabase();
@@ -99,6 +103,10 @@ const Profile = () => {
   };
   let handleFriend = () => {
     navigate("/friends");
+  };
+
+  let handleProfileEdit = () => {
+    setProfileEdit(!profileEdit);
   };
   //############################# handleButton end ########
 
@@ -316,9 +324,18 @@ const Profile = () => {
                       mobile apps (iOS & android) and creative projects. Open to
                       offers.
                     </p>
-                    <div onClick={() => setContactModal(!contactModal)}>
+                    <div className="flex justify-between w-full items-center">
                       {" "}
-                      <ButOn butName="Contact info" />
+                      <div onClick={() => setContactModal(!contactModal)}>
+                        {" "}
+                        <ButOn butName="Contact info" />
+                      </div>
+                      <p
+                        className="mt-6 p-1 bg-[#086FA4] text-[#FFFFFF] cursor-pointer hover:bg-cyan-600 font-nuni font-semibold border border-solid border-orange-600  text-base h-8 rounded-[4px]"
+                        onClick={handleProfileEdit}
+                      >
+                        Edit
+                      </p>{" "}
                     </div>
                   </div>
                 </div>
@@ -641,8 +658,41 @@ const Profile = () => {
           <div className="opacity-25 fixed inset-0 z-40 bg-black"></div>
         </>
       ) : null}
+
+      {/* // ############################################################################ Contact Modasl end ##### */}
+
+      {/* // ############################################################################ Edit profile Modasl start ##### */}
+
+      {profileEdit ? (
+        <>
+          <div className="justify-center border-2 rounded-lg border-solid border-orange-500 items-center flex overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none">
+            <div className="relative w-auto my-6 mx-auto max-w-3xl">
+              {/*content*/}
+              <div className="border-0 rounded-lg shadow-lg relative flex flex-col w-full bg-white outline-none focus:outline-none">
+                {/*header*/}
+
+                {/*body*/}
+               <EditProfile/>
+
+                {/*footer*/}
+                <div className="flex items-center justify-end p-6 border-t border-solid border-slate-200 rounded-b">
+                  <button
+                    className="text-red-500 background-transparent font-bold uppercase px-6 py-2 text-sm outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
+                    type="button"
+                    onClick={() => setProfileEdit(!profileEdit)}
+                  >
+                    Close
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="opacity-25 fixed inset-0 z-40 bg-black"></div>
+        </>
+      ) : null}
+
+      {/* // ############################################################################ edit-profile Modasl end ##### */}
     </>
-    // ############################################################################ Contact Modasl end #####
   );
 };
 
