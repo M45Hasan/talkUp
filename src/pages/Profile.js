@@ -54,8 +54,8 @@ const Profile = () => {
   const [image, setImage] = useState();
   const [show, setShow] = useState(false);
   let [arrShow, setArr] = useState([]);
+  let [newArr, setNew] = useState([]);
   let [profileEdit, setProfileEdit] = useState(false);
-  
 
   const auth = getAuth();
   const db = getDatabase();
@@ -249,13 +249,27 @@ const Profile = () => {
         console.log("ami Arritem:", item);
         if (item.key == reduxReturnData.userStoreData.userInfo.uid) {
           arr.push({
-            item,
+            ...item.val(),
           });
         }
       });
       setArr(arr);
     });
     console.log("ami ARR hello:", arrShow);
+  }, []);
+
+  useEffect(() => {
+    const userRef = def(db, "userInfo");
+    onValue(userRef, (snapshot) => {
+      let arr = [];
+      snapshot.forEach((item) => {
+        if (item.key == reduxReturnData.userStoreData.userInfo.uid) {
+          arr.push({ ...item.val() });
+        }
+      });
+      setNew(arr);
+    });
+    console.log("ami Location", newArr);
   }, []);
   //#################################### cover Img end ###
 
@@ -315,15 +329,17 @@ const Profile = () => {
                         {reduxReturnData.userStoreData.userInfo.displayName}
                       </h2>
                       <TiLocationArrowOutline className=" translate-x-[132px] translate-y-[2px] text-[blue] " />
-                      <p className="font-bar font-medium text-base text-[#181818]">
-                        Saint Petersburg, Russian Federation
-                      </p>
+                      {newArr.map((item) => (
+                        <p className="font-bar font-medium text-base text-[#181818]">
+                          {item.location}
+                        </p>
+                      ))}
                     </div>
-                    <p className="font-bar font-rugular text-base text-[#181818]">
-                      Freelance UX/UI designer, 80+ projects in web design,
-                      mobile apps (iOS & android) and creative projects. Open to
-                      offers.
-                    </p>
+                    {newArr.map((item) => (
+                      <p className="font-bar font-rugular text-base text-[#181818]">
+                        {item.about}.
+                      </p>
+                    ))}
                     <div className="flex justify-between w-full items-center">
                       {" "}
                       <div onClick={() => setContactModal(!contactModal)}>
@@ -672,7 +688,7 @@ const Profile = () => {
                 {/*header*/}
 
                 {/*body*/}
-               <EditProfile/>
+                <EditProfile />
 
                 {/*footer*/}
                 <div className="flex items-center justify-end p-6 border-t border-solid border-slate-200 rounded-b">

@@ -1,14 +1,39 @@
-import React from "react";
+import React, { useState } from "react";
+import { getDatabase, ref, set, push } from "firebase/database";
+import { useSelector } from "react-redux";
 
 const EditProfile = () => {
+  const db = getDatabase();
+  let reduxReturnData = useSelector((state) => state);
+  let [data, setData] = useState({
+    add: "",
+    about: "",
+  });
+  let [editShow, setShow] = useState(false);
+  let handleChange = (e) => {
+    setShow(false);
+
+    let { name, value } = e.target;
+    setData({ ...data, [name]: value });
+    console.log(data);
+  };
+  let handleProfile123 = () => {
+    set(ref(db, "userInfo/" + reduxReturnData.userStoreData.userInfo.uid), {
+      location: data.add,
+      about: data.about,
+    });
+    setShow(!editShow);
+  };
+
   return (
     <div className="w-[400px] h-[300px] border border-solid border-cyan-500 rounded-md relative p-6 flex-auto">
       <div className="mb-2">
         <label>
           <span className="text-gray-700">Location</span>
           <input
-            name="email"
+            name="add"
             type="text"
+            onChange={handleChange}
             className="
             block
             w-full
@@ -21,8 +46,6 @@ const EditProfile = () => {
             focus:ring-indigo-200
             focus:ring-opacity-50
           "
-       
-         
           />
         </label>
       </div>
@@ -31,6 +54,7 @@ const EditProfile = () => {
           <span class="text-gray-700">About </span>
           <textarea
             name="about"
+            onChange={handleChange}
             className="
             block
             w-full
@@ -49,6 +73,18 @@ const EditProfile = () => {
           ></textarea>
         </label>
       </div>
+      {!editShow ? (
+        <p
+          className="mt-6 inline-block p-1 bg-[#086FA4] text-[#FFFFFF] cursor-pointer hover:bg-cyan-600 font-nuni font-semibold border border-solid border-orange-600  text-base h-8 rounded-[4px]"
+          onClick={handleProfile123}
+        >
+          Edit
+        </p>
+      ) : (
+        <p className="mt-6 inline-block p-1 bg-[#086FA4] text-[#FFFFFF] cursor-pointer hover:bg-cyan-600 font-nuni font-semibold border border-solid border-orange-600  text-base h-8 rounded-[4px]">
+          Edit Successful
+        </p>
+      )}
     </div>
   );
 };
