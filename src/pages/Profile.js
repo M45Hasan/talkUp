@@ -288,11 +288,11 @@ const Profile = () => {
               <div className="block ">
                 <div className="relative">
                   <image className="w-[840px] h-[160px] bg-cover bg-center ">
-                    {!picture.length == 0 ? (
-                      picture.map((item) => (
+                    {!arrShow.length == 0 ? (
+                      arrShow.map((item) => (
                         <img
                           id="cover"
-                          src={item}
+                          src={item.coverPic}
                           className="w-[840px] h-[160px]  overflow-hidden "
                           alt=" cover"
                         />
