@@ -11,6 +11,10 @@ import Profile from "./pages/Profile";
 import Regi from "./pages/Regi";
 import Sign from "./pages/Sign";
 import Friends from "./pages/Friends";
+// import RootLayout from "./pages/RootLayout";
+
+import RootLayout from "./pages/RootLayout";
+import Post from "./pages/Post";
 
 function App() {
   let router = createBrowserRouter(
@@ -18,9 +22,12 @@ function App() {
       <Route>
         <Route path="/" element={<Regi />} />
         <Route path="/signin" element={<Sign />} />
-        <Route path="/profile" element={<Profile />} />
 
-        <Route path="friends" element={<Friends />} />
+        <Route path="/" element={<RootLayout />}>
+          <Route path="profile" element={<Profile />} />
+          <Route  path="friends" element={<Friends />} />
+          <Route path="post" element={<Post />} />
+        </Route>
       </Route>
     )
   );

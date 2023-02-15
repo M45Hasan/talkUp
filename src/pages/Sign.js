@@ -161,6 +161,10 @@ const Sign = () => {
   let handleIcon = () => {
     setIcon(!iCon);
   };
+
+  let handleSign = () => {
+    navigate("/");
+  };
   // ######################################### handleChange Func end #########
 
   return (
@@ -209,7 +213,15 @@ const Sign = () => {
               colors={["#e15b64", "#f47e60", "#f8b26a", "#abbd81", "#849b87"]}
             />
           ) : (
-            <Buttonx click={handleClick} butName="Sign In" />
+            <div className="w-full">
+              <Buttonx click={handleClick} butName="Sign In" />
+              <p
+                className="text-center text-bar pt-3  font-medium text-base text-[#0275B1] cursor-pointer "
+                onClick={handleSign}
+              >
+                Create New One
+              </p>
+            </div>
           )}
         </div>
       </div>

@@ -24,7 +24,7 @@ const Slide = () => {
   };
   return (
     <>
-      <Topic topic="Project" count={current} total={total} />
+      <Topic topic="Project" count={current} total={total} x={true} />
       <div className=" w-full h-[300px] ">
         <Slider {...settings} className=" mt-5">
           <div>

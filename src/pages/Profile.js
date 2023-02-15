@@ -24,6 +24,8 @@ import { getAuth, updateProfile } from "firebase/auth";
 import { getDatabase, ref as def, set, push, onValue } from "firebase/database";
 import Slide from "../component/Slide";
 import EditProfile from "../component/EditProfile";
+import Container from "../component/Container";
+
 const Profile = () => {
   //############################ state start####
 
@@ -275,211 +277,213 @@ const Profile = () => {
 
   return (
     <>
-      <div className="w-[100%] flex justify-center items-center">
-        <div>
-          <nav className=" bg-white max-w-container h-16 px-[40px] py-3 flex justify-between items-center ">
-            <image>
-              <Image imgSrc="../assets/lo.png" />
-            </image>
-            <LogoutButton />
-          </nav>
-          <div className=" flex justify-between w-max pt-4   pl-[86px]">
-            <div className=" w-[777px] h-[360px] ">
-              <div className="block ">
-                <div className="relative">
-                  <image className="w-[840px] h-[160px] bg-cover bg-center ">
-                    {!arrShow.length == 0 ? (
-                      arrShow.map((item) => (
+      <Container>
+        <div className="w-[100%] flex justify-start mt- items-center">
+          <div>
+            <div className=" flex justify-between w-max pt-4   ">
+              <div className=" w-[777px] h-[360px] ">
+                <div className="block ">
+                  <div className="relative">
+                    <image className="w-[840px] h-[160px] bg-cover bg-center ">
+                      {!arrShow.length == 0 ? (
+                        arrShow.map((item) => (
+                          <img
+                            id="cover"
+                            src={item.coverPic}
+                            className="w-[840px] h-[160px]  overflow-hidden "
+                            alt=" cover"
+                          />
+                        ))
+                      ) : (
                         <img
                           id="cover"
-                          src={item.coverPic}
+                          src="assets/banner.png"
                           className="w-[840px] h-[160px]  overflow-hidden "
                           alt=" cover"
                         />
-                      ))
-                    ) : (
-                      <img
-                        id="cover"
-                        src="assets/banner.png"
-                        className="w-[840px] h-[160px]  overflow-hidden "
-                        alt=" cover"
-                      />
-                    )}
-                  </image>
+                      )}
+                    </image>
 
-                  <BsFillCameraFill
-                    className="absolute top-3 right-7 text-orange-700 "
-                    onClick={() => setShowMod(true)}
-                  />
-                </div>
-                <div className=" flex justify-between">
-                  <image
-                    onClick={() => setShowModal(true)}
-                    className="z-0 w-[170px] h-[170px] mt-[14px] pl-3"
-                  >
-                    <Image
-                      className="mt-[-44px] w-[158px] h-[158px] rounded-full shadow-sm align-bottom border-[4px] border-white border-solid"
-                      imgSrc={profile}
+                    <BsFillCameraFill
+                      className="absolute top-3 right-7 text-orange-700 "
+                      onClick={() => setShowMod(true)}
                     />
-                  </image>
+                  </div>
+                  <div className=" flex justify-between">
+                    <image
+                      onClick={() => setShowModal(true)}
+                      className="z-0 w-[170px] h-[170px] mt-[14px] pl-3"
+                    >
+                      <Image
+                        className="mt-[-44px] w-[158px] h-[158px] rounded-full shadow-sm align-bottom border-[4px] border-white border-solid"
+                        imgSrc={profile}
+                      />
+                    </image>
 
-                  <div className=" w-[600px] ">
-                    <div className=" flex justify-between pb-2 pr-7">
-                      <h2 className="inline-block font-bar font-bold text-[18px]">
-                        {reduxReturnData.userStoreData.userInfo.displayName}
-                      </h2>
-                      <TiLocationArrowOutline className=" translate-x-[132px] translate-y-[2px] text-[blue] " />
+                    <div className=" w-[600px] ">
+                      <div className=" flex justify-between pb-2 pr-7">
+                        <h2 className="inline-block font-bar font-bold text-[18px]">
+                          {reduxReturnData.userStoreData.userInfo.displayName}
+                        </h2>
+                        <TiLocationArrowOutline className=" translate-x-[132px] translate-y-[2px] text-[blue] " />
+                        {newArr.map((item) => (
+                          <p className="font-bar font-medium text-base text-[#181818]">
+                            {item.location}
+                          </p>
+                        ))}
+                      </div>
                       {newArr.map((item) => (
-                        <p className="font-bar font-medium text-base text-[#181818]">
-                          {item.location}
+                        <p className="font-bar font-rugular text-base text-[#181818]">
+                          {item.about}.
                         </p>
                       ))}
-                    </div>
-                    {newArr.map((item) => (
-                      <p className="font-bar font-rugular text-base text-[#181818]">
-                        {item.about}.
-                      </p>
-                    ))}
-                    <div className="flex justify-between w-full items-center">
-                      {" "}
-                      <div onClick={() => setContactModal(!contactModal)}>
+                      <div className="flex justify-between w-full items-center">
                         {" "}
-                        <ButOn butName="Contact info" />
+                        <div onClick={() => setContactModal(!contactModal)}>
+                          {" "}
+                          <ButOn butName="Contact info" />
+                        </div>
+                        <p
+                          className="mt-6 p-1 bg-[#086FA4] text-[#FFFFFF] cursor-pointer hover:bg-cyan-600 font-nuni font-semibold border border-solid border-orange-600  text-base h-8 rounded-[4px]"
+                          onClick={handleProfileEdit}
+                        >
+                          Edit
+                        </p>{" "}
                       </div>
+                    </div>
+                  </div>
+                  <div className="pt-6 flex items-end w-[720px]">
+                    <div className="w-[240px] flex items-center justify-center h-12 bg-[#0E6795] cursor-pointer">
+                      <p className="font-bar font-medium font-base text-white">
+                        Profile
+                      </p>{" "}
+                    </div>
+                    <div className="cursor-pointer w-[240px] h-10 border  hover:bg-cyan-500 bg-[#FFFFFF] border-solid border-[#bab8b8] flex items-center justify-center">
+                      {" "}
                       <p
-                        className="mt-6 p-1 bg-[#086FA4] text-[#FFFFFF] cursor-pointer hover:bg-cyan-600 font-nuni font-semibold border border-solid border-orange-600  text-base h-8 rounded-[4px]"
-                        onClick={handleProfileEdit}
+                        className="font-bar font-medium font-base text-black"
+                        onClick={handleFriend}
                       >
-                        Edit
+                        Friends
+                      </p>{" "}
+                    </div>
+                    <div
+                      onClick={() => {
+                        navigate("post");
+                      }}
+                      className="cursor-pointer w-[240px] h-10 border  hover:bg-cyan-500 bg-[#FFFFFF] border-solid border-[#bab8b8] flex items-center justify-center"
+                    >
+                      {" "}
+                      <p className="font-bar font-medium font-base text-black">
+                        Post
                       </p>{" "}
                     </div>
                   </div>
-                </div>
-                <div className="pt-6 flex items-end w-[720px]">
-                  <div className="w-[240px] flex items-center justify-center h-12 bg-[#0E6795] cursor-pointer">
-                    <p className="font-bar font-medium font-base text-white">
-                      Profile
-                    </p>{" "}
-                  </div>
-                  <div className="cursor-pointer w-[240px] h-10 border bg-[#FFFFFF] border-solid border-[#bab8b8] flex items-center justify-center">
-                    {" "}
-                    <p
-                      className="font-bar font-medium font-base text-black"
-                      onClick={handleFriend}
-                    >
-                      Friends
-                    </p>{" "}
-                  </div>
-                  <div className="cursor-pointer w-[240px] h-10 border bg-[#FFFFFF] border-solid border-[#bab8b8] flex items-center justify-center">
-                    {" "}
-                    <p className="font-bar font-medium font-base text-black">
-                      Post
-                    </p>{" "}
-                  </div>
-                </div>
-                {!seeShow ? (
-                  <div className="h-[170px] bg-white border border-solid border-[#bab8b8] w-full mt-7 p-7">
-                    <h3 className="font-bar font-bold text-lg">About</h3>
-                    <p className="font-bar font-medium text-[14px] text-[#181818]] mt-2">
-                      {seeWrite}
-                    </p>
-                    <p
-                      className="text-bar font-medium text-base text-[#0275B1] cursor-pointer hover:text-[20px] mt-5 inline-block"
-                      onClick={handleSee}
-                    >
-                      {" "}
-                      See more
-                    </p>
-                  </div>
-                ) : (
-                  <div className=" bg-white border border-solid border-[#bab8b8] w-full mt-7 p-7 relative">
-                    <h3 className="font-bar font-bold text-lg">About</h3>
-
-                    <br />
-
-                    {postShow && <p>{seeWrite}</p>}
-
-                    {!editShow && (
-                      <textarea
-                        rows={4}
-                        cols={10}
-                        value={seeWrite}
-                        className="block w-full border-0 mt-2"
-                        onChange={handleWrite}
-                      />
-                    )}
-                    <div className="flex justify-between w-full">
+                  {!seeShow ? (
+                    <div className="h-[170px] bg-white border border-solid border-[#bab8b8] w-full mt-7 p-7">
+                      <h3 className="font-bar font-bold text-lg">About</h3>
+                      <p className="font-bar font-medium text-[14px] text-[#181818]] mt-2">
+                        {seeWrite}
+                      </p>
                       <p
-                        className="text-bar inline-block font-medium text-base text-[#0275B1] cursor-pointer hover:text-[20px] mt-5 "
+                        className="text-bar font-medium text-base text-[#0275B1] cursor-pointer hover:text-[20px] mt-5 inline-block"
                         onClick={handleSee}
                       >
                         {" "}
-                        See Less
+                        See more
                       </p>
-                      <div className="flex gap-x-4">
+                    </div>
+                  ) : (
+                    <div className=" bg-white border border-solid border-[#bab8b8] w-full mt-7 p-7 relative">
+                      <h3 className="font-bar font-bold text-lg">About</h3>
+
+                      <br />
+
+                      {postShow && <p>{seeWrite}</p>}
+
+                      {!editShow && (
+                        <textarea
+                          rows={4}
+                          cols={10}
+                          value={seeWrite}
+                          className="block w-full border-0 mt-2"
+                          onChange={handleWrite}
+                        />
+                      )}
+                      <div className="flex justify-between w-full">
                         <p
                           className="text-bar inline-block font-medium text-base text-[#0275B1] cursor-pointer hover:text-[20px] mt-5 "
-                          onClick={handleEdit}
+                          onClick={handleSee}
                         >
                           {" "}
-                          Edit
+                          See Less
                         </p>
-                        <p
-                          className="text-bar inline-block font-medium text-base text-[#0275B1] cursor-pointer hover:text-[20px] mt-5 "
-                          onClick={handlePost}
-                        >
-                          {" "}
-                          Post
-                        </p>
+                        <div className="flex gap-x-4">
+                          <p
+                            className="text-bar inline-block font-medium text-base text-[#0275B1] cursor-pointer hover:text-[20px] mt-5 "
+                            onClick={handleEdit}
+                          >
+                            {" "}
+                            Edit
+                          </p>
+                          <p
+                            className="text-bar inline-block font-medium text-base text-[#0275B1] cursor-pointer hover:text-[20px] mt-5 "
+                            onClick={handlePost}
+                          >
+                            {" "}
+                            Post
+                          </p>
+                        </div>
                       </div>
                     </div>
+                  )}
+
+                  <div className="mt-7 p-7 w-full bg-[#FFFFFF] border border-solid border-[#bab8b8] h-[355px]">
+                    <Slide />
                   </div>
-                )}
 
-                <div className="mt-7 p-7 w-full bg-[#FFFFFF] border border-solid border-[#bab8b8] h-[355px]">
-                  <Slide />
-                </div>
-
-                <div className="w-full h-[370px] bg-[#FFFFFF] border border-solid border-[#bab8b8] mt-4 p-5 ">
-                  <WorkExp
-                    topic="Experience"
-                    className=""
-                    imgSrc="../assets/wx.png"
-                    jbName="Freelance UX/UI designer"
-                    position="Jun 2016 — Present"
-                    place="Around the world"
-                    time="Jun 2016 — Present"
-                    duration="3 yrs 3 mos"
-                    details="Work with clients and web studios as freelancer.  Work in next areas: eCommerce web projects; creative landing pages; iOs and Android apps; corporate web sites and corporate identity sometimes."
-                  />
-                  <WorkExp
-                    topic=""
-                    className=""
-                    imgSrc="../assets/wx1.png"
-                    jbName="Freelance UX/UI designer"
-                    position="Jun 2016 — Present"
-                    place="Around the world"
-                    time="Jun 2016 — Present"
-                    duration="3 yrs 3 mos"
-                    details="Work with clients and web studios as freelancer.  Work in next areas: eCommerce web projects; creative landing pages; iOs and Android apps; corporate web sites and corporate identity sometimes."
-                  />
-                </div>
-                <div className="w-full h-[195px] mt-[30px] bg-[#FFFFFF] border border-solid border-[#bab8b8] p-8">
-                  <WorkExp
-                    topic="Education"
-                    className=" w-10 h-10"
-                    imgSrc="../assets/wx2.png"
-                    jbName="Bachelor's degree Field Of StudyComputer and Information Systems Security/Information Assurance"
-                    time="2013 — 2017"
-                    details="Additional English classes and UX profile courses​."
-                  />
+                  <div className="w-full h-[370px] bg-[#FFFFFF] border border-solid border-[#bab8b8] mt-4 p-5 ">
+                    <WorkExp
+                      topic="Experience"
+                      className=""
+                      imgSrc="../assets/wx.png"
+                      jbName="Freelance UX/UI designer"
+                      position="Jun 2016 — Present"
+                      place="Around the world"
+                      time="Jun 2016 — Present"
+                      duration="3 yrs 3 mos"
+                      details="Work with clients and web studios as freelancer.  Work in next areas: eCommerce web projects; creative landing pages; iOs and Android apps; corporate web sites and corporate identity sometimes."
+                    />
+                    <WorkExp
+                      topic=""
+                      className=""
+                      imgSrc="../assets/wx1.png"
+                      jbName="Freelance UX/UI designer"
+                      position="Jun 2016 — Present"
+                      place="Around the world"
+                      time="Jun 2016 — Present"
+                      duration="3 yrs 3 mos"
+                      details="Work with clients and web studios as freelancer.  Work in next areas: eCommerce web projects; creative landing pages; iOs and Android apps; corporate web sites and corporate identity sometimes."
+                    />
+                  </div>
+                  <div className="w-full h-[195px] mt-[30px] bg-[#FFFFFF] border border-solid border-[#bab8b8] p-8">
+                    <WorkExp
+                      topic="Education"
+                      className=" w-10 h-10"
+                      imgSrc="../assets/wx2.png"
+                      jbName="Bachelor's degree Field Of StudyComputer and Information Systems Security/Information Assurance"
+                      time="2013 — 2017"
+                      details="Additional English classes and UX profile courses​."
+                    />
+                  </div>
                 </div>
               </div>
+              <div className=" w-[400px]  h-min bg-slate-900"></div>
             </div>
-            <div className=" w-[400px]  h-min bg-slate-900"></div>
           </div>
         </div>
-      </div>
+      </Container>
+
       <div className="  ">
         {showModal ? (
           <>

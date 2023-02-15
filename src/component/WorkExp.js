@@ -12,6 +12,7 @@ const WorkExp = ({
   time,
   duration,
   details,
+  
 }) => {
   return (
     <div className=" w-full border-b border-solid border-[#bab8b8] ">

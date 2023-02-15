@@ -28,7 +28,7 @@ const Regi = () => {
     email: "",
     fname: "",
   });
-
+  let [wShow, setW] = useState("");
   //############################################################# import variable start###
 
   const auth = getAuth();
@@ -55,7 +55,11 @@ const Regi = () => {
       let digit = /(?=.*?[0-9])/;
       let spchar = /(?=.*?[#?!@$%^&*-])/;
       let minlen = /.{6,}/;
-
+      //####################################### progressBar start #####
+      if (name.length == 1) {
+        setW("33px");
+      }
+      //####################################### progressBar end #####
       if (!cap.test(value)) {
         setError({ ...errorData, pass: "One Capital letter required" });
         return;
@@ -125,7 +129,8 @@ const Regi = () => {
                   email: user.user.email,
                   photoURL: user.user.photoURL,
                 });
-              }).then(() => {
+              })
+              .then(() => {
                 //#######################################Loader
                 setLoad(!loadShow);
                 //   toast("Registration successful. Please check your email");
@@ -144,10 +149,9 @@ const Regi = () => {
           const errorCode = error.code;
           if (errorCode.includes("auth/email-already-in-use")) {
             setError({ ...errorData, email: "Email already exit" });
-            setTimeout(()=>{
-              navigate("/signin")
-
-            },2000)
+            setTimeout(() => {
+              navigate("/signin");
+            }, 2000);
           }
 
           console.log(errorCode);
@@ -155,6 +159,10 @@ const Regi = () => {
     }
   };
   console.log(errorData);
+
+  let handleSign = () => {
+    navigate("/signin");
+  };
   /**################################################################### handleButton end */
 
   /**##################################### pass Icon start */
@@ -224,7 +232,28 @@ const Regi = () => {
                 colors={["#e15b64", "#f47e60", "#f8b26a", "#abbd81", "#849b87"]}
               />
             ) : (
-              <Buttonx click={handleClick} butName="Sign Up" />
+              <div className="w-full">
+                <div>
+                  <Buttonx click={handleClick} butName="Sign Up" />
+                  <div className="w-[313px]mt-[109px]  rounded-full h-2.5 ">
+                    <div
+                      className="bg-blue-600 h-2.5 rounded-full w-[0]"
+                      style={{ width: wShow }}
+                    ></div>
+                  </div>
+                </div>
+
+                <p className="text-center text-bar pt-3  font-medium text-base text-[#0275B1] ">
+                  Already account{" "}
+                  <span
+                    className="text-red-600 cursor-pointer underline"
+                    onClick={handleSign}
+                  >
+                    {" "}
+                    Sign In
+                  </span>
+                </p>
+              </div>
             )}
           </div>
         </div>

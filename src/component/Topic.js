@@ -1,11 +1,17 @@
 import React from "react";
 
-const Topic = ({topic,count,total}) => {
+const Topic = ({ topic, count, total, x }) => {
   return (
     <>
       {" "}
-      <h3 className="font-bar font-bold text-[#181818] inline-block text-lg mr-10">{topic}</h3>
-      <p className="bg-[ #181818] font-bar font-normal inline-block  text-base">{count} out of {total} images</p>
+      <h3 className="font-bar font-bold text-[#181818] inline-block text-lg mr-10">
+        {topic}
+      </h3>
+      {x && (
+        <p className="bg-[ #181818] font-bar font-normal inline-block  text-base">
+          {count} out of {total} images
+        </p>
+      )}
     </>
   );
 };
