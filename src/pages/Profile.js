@@ -104,7 +104,7 @@ const Profile = () => {
     setShowCov(true);
   };
   let handleFriend = () => {
-    navigate("/friends");
+    ;
   };
 
   let handleProfileEdit = () => {
@@ -362,14 +362,14 @@ const Profile = () => {
                       {" "}
                       <p
                         className="font-bar font-medium font-base text-black"
-                        onClick={handleFriend}
+                        onClick={()=>{navigate("/friends")}}
                       >
                         Friends
                       </p>{" "}
                     </div>
                     <div
                       onClick={() => {
-                        navigate("post");
+                        navigate("/post");
                       }}
                       className="cursor-pointer w-[240px] h-10 border  hover:bg-cyan-500 bg-[#FFFFFF] border-solid border-[#bab8b8] flex items-center justify-center"
                     >

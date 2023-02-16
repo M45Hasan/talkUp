@@ -41,7 +41,7 @@ const Friends = () => {
           </div>
           <div
             onClick={() => {
-              navigate("profile/post");
+              navigate("/post");
             }}
             className="cursor-pointer w-[240px] h-10 border bg-[#FFFFFF] border-solid border-[#bab8b8]  hover:bg-cyan-500 flex items-center justify-center"
           >
