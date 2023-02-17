@@ -1,11 +1,11 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import Image from "../component/Image";
 import { BsFillCameraFill } from "react-icons/bs";
 
 import { useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { activeUser } from "../slices/UserSlice";
-import LogoutButton from "../component/LogoutButton";
+
 import ButOn from "../component/ButOn";
 import WorkExp from "../component/WorkExp";
 import { TiLocationArrowOutline } from "react-icons/ti";
@@ -18,10 +18,10 @@ import {
   uploadString,
   getDownloadURL,
   listAll,
-  list,
+  
 } from "firebase/storage";
 import { getAuth, updateProfile } from "firebase/auth";
-import { getDatabase, ref as def, set, push, onValue } from "firebase/database";
+import { getDatabase, ref as def, set,  onValue } from "firebase/database";
 import Slide from "../component/Slide";
 import EditProfile from "../component/EditProfile";
 import Container from "../component/Container";

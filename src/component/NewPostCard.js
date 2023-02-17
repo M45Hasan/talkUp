@@ -1,30 +1,30 @@
-import React, { useState } from "react";
+import React from "react";
 import { AiTwotoneLike } from "react-icons/ai";
-import { useSelector } from "react-redux";
+
 import Image from "./Image";
 
-const NewPostCard = ({ text, title, postSrc, fndSrc }) => {
-  let [show, setShow] = useState(true);
 
-  let hide = () => {
-    setShow(false);
-  };
+const NewPostCard = ({ text, title, postSrc, fndSrc }) => {
+  
+
   return (
-    <>
-      
-        <div className={!postSrc == "" ? "relative  mb-3" : "relative mb-4 "}>
-          {postSrc && (
-            <img
-              className="rounded-t-lg w-300px h-[200px]"
-              src={postSrc}
-              alt="card"
-            />
-          )}
-          <image className="absolute top-2 left-2">
-            <Image className="w-[42px] h-[42px] rounded-full" imgSrc={fndSrc} />
-          </image>
-        </div>
     
+    <div>
+      
+      <div className={!postSrc == "" ? "relative  mb-3" : "relative mb-4 "}>
+
+        {postSrc && (
+          <img
+            className="rounded-t-lg w-[400px] h-[200px]"
+            src={postSrc}
+            alt="card"
+          />
+        )}
+        <image className="absolute top-2 left-2">
+          <Image className="w-[42px] h-[42px] rounded-full" imgSrc={fndSrc} />
+        </image>
+      </div>
+
       <div className="p-3 ">
         <div className={!postSrc == "" ? "mt-0" : "mt-8"}>
           {title && (
@@ -41,7 +41,7 @@ const NewPostCard = ({ text, title, postSrc, fndSrc }) => {
               <AiTwotoneLike />
             </p>
             <p
-              onClick={hide}
+              onClick={"hide"}
               className="cursor-pointer font-bar p-1 text-white font-semibold rounded-lg hover:bg-cyan-500 bg-[#0E6795]"
             >
               Hide
@@ -49,7 +49,7 @@ const NewPostCard = ({ text, title, postSrc, fndSrc }) => {
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 };
 

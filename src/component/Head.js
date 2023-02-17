@@ -4,20 +4,20 @@ import Slider from "react-slick";
 import LogoutButton from "./LogoutButton";
 import { useNavigate } from "react-router-dom";
 
-import { getDatabase } from "firebase/database";
-
 import { useSelector } from "react-redux";
 import NewPostCard from "./NewPostCard";
+import { getDatabase, ref, set, onValue, push } from "firebase/database";
 
 const Head = () => {
   const settings = {
     dots: false,
     infinite: true,
-    speed: 500,
+    speed: 300,
     slidesToShow: 1,
     slidesToScroll: 1,
     autoplay: true,
     arrows: false,
+    adaptiveHeight: true,
   };
 
   const [profile, setProfile] = useState("");
@@ -38,89 +38,65 @@ const Head = () => {
   useEffect(() => {
     setProfile(reduxReturnData.userStoreData.userInfo.photoURL);
   }, [reduxReturnData]);
+  //######################################database call####
+
+  let [userPost, setPost] = useState([]);
+
+  useEffect(() => {
+    const userRef = ref(db, "userPost/");
+    onValue(userRef, (snapshot) => {
+      let arr = [];
+      snapshot.forEach((item) => {
+        if (item.key !== reduxReturnData.userStoreData.userInfo.uid)
+          arr.push({ ...item.val() });
+        console.log(item.key);
+      });
+      setPost(arr);
+    });
+    console.log("ami Post arr", userPost);
+  }, []);
 
   return (
     <>
-      <nav className=" bg-white w-full h-16 px-[40px] py-3 flex justify-between items-center ">
-        <image>
-          <Image imgSrc="../assets/lo.png" />
-        </image>
-        <div className="w-[28%]  flex justify-between items-center">
-          <div className="flex  w-[80px] justify-between ">
-            <image>
-              <Image
-                className="w-[42px] h-[42px] rounded-full"
-                imgSrc={reduxReturnData.userStoreData.userInfo.photoURL}
-              />
-            </image>
-            <h4 className="font-bar font-bold text-[12px]">
-              {reduxReturnData.userStoreData.userInfo.displayName}
-            </h4>
-          </div>
+      <>
+        <nav className=" bg-white w-full h-16 px-[40px] py-3 flex justify-between items-center ">
+          <image>
+            <Image imgSrc="../assets/lo.png" />
+          </image>
+          <div className="w-[28%]  flex justify-between items-center">
+            <div className="flex  w-[80px] justify-between ">
+              <image>
+                <Image
+                  className="w-[42px] h-[42px] rounded-full"
+                  imgSrc={reduxReturnData.userStoreData.userInfo.photoURL}
+                />
+              </image>
+              <h4 className="font-bar font-bold text-[12px]">
+                {reduxReturnData.userStoreData.userInfo.displayName}
+              </h4>
+            </div>
 
-          <LogoutButton />
+            <LogoutButton />
+          </div>
+        </nav>
+
+        <div className="block absolute top-8 right-0 translate-x-[-15%] translate-y-[12%]">
+          <div className="rounded-lg shadow-lg bg-white w-[302px]">
+            <Slider {...settings} className="">
+              {userPost.map((item) => (
+                <div>
+                  <NewPostCard
+                    title="Hi"
+                    text={item.userPost}
+                    postSrc={item.userpostPhoto}
+                    fndSrc={item.userPhoto}
+                  />
+                </div>
+              ))}
+            </Slider>
+          </div>
         </div>
-      </nav>
-      <div className="block absolute top-8 right-0 translate-x-[-15%] translate-y-[12%]">
-        <div className="rounded-lg shadow-lg bg-white w-[302px]">
-          <Slider {...settings} className="">
-            <div>
-              <NewPostCard
-                title="Hello"
-                text="  Some quick example text to build on the card title and make up the
-            bulk of the card's content."
-                postSrc="https://mdbootstrap.com/img/new/standard/nature/182.jpg"
-                fndSrc={reduxReturnData.userStoreData.userInfo.photoURL}
-              />
-            </div>
-            <div className="  ">
-              <NewPostCard
-               
-                text="  Some quick example text to build on the card title and make up the
-            bulk of the card's content."
-               
-                fndSrc={reduxReturnData.userStoreData.userInfo.photoURL}
-              />
-            </div>
-            <div>
-              <NewPostCard
-                title="Hello"
-                text="  Some quick example text to build on the card title and make up the
-            bulk of the card's content."
-                postSrc="https://mdbootstrap.com/img/new/standard/nature/182.jpg"
-                fndSrc={reduxReturnData.userStoreData.userInfo.photoURL}
-              />
-            </div>
-            <div>
-              <NewPostCard
-                title="Hello"
-                text="  Some quick example text to build on the card title and make up the
-            bulk of the card's content."
-                postSrc="https://mdbootstrap.com/img/new/standard/nature/182.jpg"
-                fndSrc={reduxReturnData.userStoreData.userInfo.photoURL}
-              />
-            </div>
-            <div>
-              <NewPostCard
-                title="Hello"
-                text="  Some quick example text to build on the card title and make up the
-            bulk of the card's content."
-                postSrc="https://mdbootstrap.com/img/new/standard/nature/182.jpg"
-                fndSrc={reduxReturnData.userStoreData.userInfo.photoURL}
-              />
-            </div>
-            <div>
-              <NewPostCard
-                title="Hello"
-                text="  Some quick example text to build on the card title and make up the
-            bulk of the card's content."
-               
-                fndSrc={reduxReturnData.userStoreData.userInfo.photoURL}
-              />
-            </div>
-          </Slider>
-        </div>
-      </div>
+      </>
     </>
   );
 };
