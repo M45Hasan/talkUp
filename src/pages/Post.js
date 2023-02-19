@@ -36,14 +36,17 @@ const Post = () => {
   let storage = getStorage();
 
   let handleSend = (e) => {
-    console.log("amsdih");
+    console.log("ami postPic");
 
     if (imageUpload == null) {
-      set(ref(db, "userPost/" + reduxReturnData.userStoreData.userInfo.uid), {
-        userText: formData.userText,
-        userPhoto: formData.userPhoto,
-        userName: formData.userName,
-      }).catch((error) => {
+      set(
+        push(ref(db, "userPost/" + reduxReturnData.userStoreData.userInfo.uid)),
+        {
+          userText: formData.userText,
+          userPhoto: formData.userPhoto,
+          userName: formData.userName,
+        }
+      ).catch((error) => {
         console.log(error.code);
       });
     } else {
@@ -56,7 +59,9 @@ const Post = () => {
         getDownloadURL(snapshot.ref).then((url) => {
           console.log("url", url);
           set(
-            ref(db, "userPost/" + reduxReturnData.userStoreData.userInfo.uid),
+            push(
+              ref(db, "userPost/" + reduxReturnData.userStoreData.userInfo.uid)
+            ),
             {
               userText: formData.userText,
               userPhoto: formData.userPhoto,
@@ -80,12 +85,14 @@ const Post = () => {
   //################################### database call start ########
   let [userPost, setPost] = useState([]);
   useEffect(() => {
-    const userRef = ref(db, "userPost/");
+    const userRef = ref(
+      db,
+      "userPost/" + reduxReturnData.userStoreData.userInfo.uid
+    );
     onValue(userRef, (snapshot) => {
       let arr = [];
       snapshot.forEach((item) => {
-        arr.push({ ...item.val() });
-        console.log(item.key);
+        arr.push({ ...item.val(), id: item.key });
       });
       setPost(arr);
     });

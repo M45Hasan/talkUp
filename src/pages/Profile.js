@@ -18,13 +18,19 @@ import {
   uploadString,
   getDownloadURL,
   listAll,
-  
 } from "firebase/storage";
 import { getAuth, updateProfile } from "firebase/auth";
-import { getDatabase, ref as def, set,  onValue } from "firebase/database";
+import {
+  getDatabase,
+  ref as def,
+  set,
+  onValue,
+  remove,
+} from "firebase/database";
 import Slide from "../component/Slide";
 import EditProfile from "../component/EditProfile";
 import Container from "../component/Container";
+import EditExp from "../component/EditExp";
 
 const Profile = () => {
   //############################ state start####
@@ -103,9 +109,7 @@ const Profile = () => {
     console.log("ami");
     setShowCov(true);
   };
-  let handleFriend = () => {
-    ;
-  };
+  let handleFriend = () => {};
 
   let handleProfileEdit = () => {
     setProfileEdit(!profileEdit);
@@ -271,9 +275,50 @@ const Profile = () => {
       });
       setNew(arr);
     });
-    console.log("ami Location", newArr);
+  
   }, []);
   //#################################### cover Img end ###
+
+  //############################################# Experience Edit start #####
+  let [expShow, setExp] = useState(false);
+  let [expArr, setExpArr] = useState([]);
+
+  let handleExpr = () => {
+    
+    setExp(!expShow);
+  };
+  useEffect(() => {
+    const userRef = def(
+      db,
+      "userExp/" + reduxReturnData.userStoreData.userInfo.uid
+    );
+    onValue(userRef, (snapshot) => {
+      let arr = [];
+      snapshot.forEach((item) => {
+       ;
+
+        arr.push({
+          ...item.val(),
+          id: item.key,
+        });
+     
+      });
+      setExpArr(arr);
+      
+    });
+  }, []);
+ 
+
+  let handleDelete = (item) => {
+    console.log("ami delkete exp", item.id);
+    remove(def(db, "userExp/" + item.id));
+  };
+  //############################################# Experience Edit end #####
+
+  //############################################# Edu Edit start #####
+  let [eduShow, setEdu] = useState(false);
+
+  //############################################# edu Edit end #####
 
   return (
     <>
@@ -362,7 +407,9 @@ const Profile = () => {
                       {" "}
                       <p
                         className="font-bar font-medium font-base text-black"
-                        onClick={()=>{navigate("/friends")}}
+                        onClick={() => {
+                          navigate("/friends");
+                        }}
                       >
                         Friends
                       </p>{" "}
@@ -442,39 +489,65 @@ const Profile = () => {
                     <Slide />
                   </div>
 
-                  <div className="w-full h-[370px] bg-[#FFFFFF] border border-solid border-[#bab8b8] mt-4 p-5 ">
-                    <WorkExp
-                      topic="Experience"
-                      className=""
-                      imgSrc="../assets/wx.png"
-                      jbName="Freelance UX/UI designer"
-                      position="Jun 2016 — Present"
-                      place="Around the world"
-                      time="Jun 2016 — Present"
-                      duration="3 yrs 3 mos"
-                      details="Work with clients and web studios as freelancer.  Work in next areas: eCommerce web projects; creative landing pages; iOs and Android apps; corporate web sites and corporate identity sometimes."
-                    />
-                    <WorkExp
-                      topic=""
-                      className=""
-                      imgSrc="../assets/wx1.png"
-                      jbName="Freelance UX/UI designer"
-                      position="Jun 2016 — Present"
-                      place="Around the world"
-                      time="Jun 2016 — Present"
-                      duration="3 yrs 3 mos"
-                      details="Work with clients and web studios as freelancer.  Work in next areas: eCommerce web projects; creative landing pages; iOs and Android apps; corporate web sites and corporate identity sometimes."
-                    />
+                  <div className="w-full relative   bg-[#FFFFFF] border border-solid border-[#bab8b8] mt-4 p-5 ">
+                    <h3 className="font-bar font-bold text-[#181818] inline-block text-lg mr-10">
+                      Experience
+                    </h3>
+                    {expArr.map((item) => (
+                      <div>
+                        <WorkExp
+                          className="w-[35px] h-[35px] rounded-full"
+                          imgSrc={item.expImg}
+                          jbName={item.job}
+                          position={item.post}
+                          place={item.loc}
+                          time={item.time}
+                          duration={item.dura}
+                          details={item.about}
+                        />
+                        <button
+                          onClick={() => handleDelete(item)}
+                          className="text-bar mt-5 absolute top-0 right-[20px] block font-medium text-base bg-[#0275B1] text-white hover:text-red-500 cursor-pointer hover:bg-cyan-500 px-2 rounded-lg "
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    ))}
+
+                    <button
+                      onClick={handleExpr}
+                      className="text-bar mt-5 absolute top-0 right-[90px] block font-medium text-base bg-[#0275B1] text-white cursor-pointer hover:bg-cyan-500 px-2 rounded-lg "
+                    >
+                      Add
+                    </button>
                   </div>
-                  <div className="w-full h-[195px] mt-[30px] bg-[#FFFFFF] border border-solid border-[#bab8b8] p-8">
-                    <WorkExp
-                      topic="Education"
-                      className=" w-10 h-10"
-                      imgSrc="../assets/wx2.png"
-                      jbName="Bachelor's degree Field Of StudyComputer and Information Systems Security/Information Assurance"
-                      time="2013 — 2017"
-                      details="Additional English classes and UX profile courses​."
-                    />
+                  <div className="w-full relative   bg-[#FFFFFF] border border-solid border-[#bab8b8] mt-4 p-5 ">
+                    <h3 className="font-bar font-bold text-[#181818] inline-block text-lg mr-10">
+                      Education
+                    </h3>
+                    {expArr.map((item) => (
+                      <div>
+                        <WorkExp
+                          className="w-[35px] h-[35px] rounded-full"
+                          jbName={item.job}
+                          time={item.time}
+                          duration={item.dura}
+                        />
+                        <button
+                          onClick={() => handleDelete(item)}
+                          className="text-bar mt-5 absolute top-0 right-[20px] block font-medium text-base bg-[#0275B1] text-white hover:text-red-500 cursor-pointer hover:bg-cyan-500 px-2 rounded-lg "
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    ))}
+
+                    <button
+                      onClick={handleExpr}
+                      className="text-bar mt-5 absolute top-0 right-[90px] block font-medium text-base bg-[#0275B1] text-white cursor-pointer hover:bg-cyan-500 px-2 rounded-lg "
+                    >
+                      Add
+                    </button>
                   </div>
                 </div>
               </div>
@@ -693,13 +766,14 @@ const Profile = () => {
 
                 {/*body*/}
                 <EditProfile />
-
                 {/*footer*/}
-                <div className="flex items-center justify-end p-6 border-t border-solid border-slate-200 rounded-b">
+                <div
+                  onClick={() => setProfileEdit(!profileEdit)}
+                  className="flex items-center justify-end p-6 border-t border-solid border-slate-200 rounded-b"
+                >
                   <button
                     className="text-red-500 background-transparent font-bold uppercase px-6 py-2 text-sm outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
                     type="button"
-                    onClick={() => setProfileEdit(!profileEdit)}
                   >
                     Close
                   </button>
@@ -712,6 +786,70 @@ const Profile = () => {
       ) : null}
 
       {/* // ############################################################################ edit-profile Modasl end ##### */}
+
+      {/* // ############################################################################ edit-Exp Modasl start ##### */}
+
+      {expShow ? (
+        <>
+          <div className="justify-center border-2 rounded-lg border-solid border-orange-500 items-center flex overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none">
+            <div className="relative w-auto my-6 mx-auto max-w-3xl">
+              {/*content*/}
+              <div className="border-0 rounded-lg shadow-lg relative flex flex-col w-full bg-white outline-none focus:outline-none">
+                {/*header*/}
+
+                {/*body*/}
+                <EditExp />
+                {/*footer*/}
+                <div
+                  onClick={() => setExp(!expShow)}
+                  className="flex items-center justify-end p-6 border-t border-solid border-slate-200 rounded-b"
+                >
+                  <button
+                    className="text-red-500 background-transparent font-bold uppercase px-6 py-2 text-sm outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
+                    type="button"
+                  >
+                    Close
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="opacity-25 fixed inset-0 z-40 bg-black"></div>
+        </>
+      ) : null}
+      {/* // ############################################################################ edit-Exp Modasl end ##### */}
+
+      {/* // ############################################################################ edu-Exp Modasl start ##### */}
+      {eduShow ? (
+        <>
+          <div className="justify-center border-2 rounded-lg border-solid border-orange-500 items-center flex overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none">
+            <div className="relative w-auto my-6 mx-auto max-w-3xl">
+              {/*content*/}
+              <div className="border-0 rounded-lg shadow-lg relative flex flex-col w-full bg-white outline-none focus:outline-none">
+                {/*header*/}
+
+                {/*body*/}
+                <EditExp />
+                {/*footer*/}
+                <div
+                  onClick={() => setExp(!eduShow)}
+                  className="flex items-center justify-end p-6 border-t border-solid border-slate-200 rounded-b"
+                >
+                  <button
+                    className="text-red-500 background-transparent font-bold uppercase px-6 py-2 text-sm outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
+                    type="button"
+                  >
+                    Close
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="opacity-25 fixed inset-0 z-40 bg-black"></div>
+        </>
+      ) : null}
+
+      {/* // ############################################################################ edu-Exp Modasl end ##### */}
     </>
   );
 };

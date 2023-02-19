@@ -3,7 +3,6 @@ import Topic from "./Topic";
 import Image from "./Image";
 
 const WorkExp = ({
-  topic,
   className,
   imgSrc,
   jbName,
@@ -12,16 +11,15 @@ const WorkExp = ({
   time,
   duration,
   details,
-  
 }) => {
   return (
     <div className=" w-full border-b border-solid border-[#bab8b8] ">
-      {topic && <Topic topic={topic} />}
-
       <div className="flex mt-3 gap-x-2 ">
-        <div className="">
-          <Image className={className} imgSrc={imgSrc} />
-        </div>
+        {imgSrc && (
+          <div className="">
+            <Image className={className} imgSrc={imgSrc} />
+          </div>
+        )}
         <div className="">
           {jbName && (
             <h4 className="font-bar font-normal text-sm text-[#181818] mb-5">
@@ -42,7 +40,7 @@ const WorkExp = ({
             )}
           </div>
           <div>
-          {time && (
+            {time && (
               <p className=" font-bar text-[#181818] font-normal inline-block  text-[10px] mr-10">
                 {time}
               </p>
@@ -52,7 +50,8 @@ const WorkExp = ({
                 {duration}
               </p>
             )}
-
+          </div>
+          <div>
             {details && (
               <p className=" font-bar text-[#181818] font-normal inline-block  text-[10px] mb-3">
                 {details}
