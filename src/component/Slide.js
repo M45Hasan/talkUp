@@ -15,10 +15,10 @@ const Slide = () => {
     fade: false,
     beforeChange: (oldIndex, newIndex) => {
       if (newIndex == 0) {
-        console.log(setCurrent((newIndex = 1)));
-        console.log(setTotal(oldIndex + 1));
+        setCurrent((newIndex = 1));
+        setTotal(oldIndex + 1);
       } else {
-        console.log(setCurrent(newIndex + 1));
+        setCurrent(newIndex + 1);
       }
     },
   };
@@ -34,9 +34,8 @@ const Slide = () => {
               imgSrc="../assets/s1.png"
             />
           </div>
-          <div  className="w-[200px] h-[160px] m-2  ">
-            <link href="https://hasan-ecom.netlify.app/"/>
-
+          <div className="w-[200px] h-[160px] m-2  ">
+            <link href="https://hasan-ecom.netlify.app/" />
           </div>
           <div>
             {" "}

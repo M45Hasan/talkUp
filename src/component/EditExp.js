@@ -7,6 +7,8 @@ import {
   getDownloadURL,
   getStorage,
 } from "firebase/storage";
+import { v4 } from "uuid";
+
 
 const EditExp = () => {
   let db = getDatabase();
@@ -38,28 +40,32 @@ const EditExp = () => {
     console.log("ami Exp data");
 
     if (imageUpload == null) {
-      set(ref(db, "userExp/" + reduxReturnData.userStoreData.userInfo.uid), {
-        job: formData.job,
-        post: formData.post,
-        loc: formData.loc,
-        time: formData.time,
-        dura: formData.dura,
-        about: formData.about,
-      }).catch((error) => {
+      set(
+        push(ref(db, "userExp/" + reduxReturnData.userStoreData.userInfo.uid)),
+        {
+          job: formData.job,
+          post: formData.post,
+          loc: formData.loc,
+          time: formData.time,
+          dura: formData.dura,
+          about: formData.about,
+        }
+      ).catch((error) => {
         console.log(error.code);
       });
       setShow(!editShow);
     } else {
       const imageRef = def(
         storage,
-        `userExpURL/${reduxReturnData.userStoreData.userInfo.uid}`
+        `userExpURL/${reduxReturnData.userStoreData.userInfo.uid} /${v4()}`
       );
-
       uploadBytes(imageRef, imageUpload).then((snapshot) => {
         getDownloadURL(snapshot.ref).then((url) => {
           console.log("url", url);
           set(
-           push( ref(db, "userExp/" + reduxReturnData.userStoreData.userInfo.uid)),
+            push(
+              ref(db, "userExp/" + reduxReturnData.userStoreData.userInfo.uid)
+            ),
             {
               job: formData.job,
               post: formData.post,
@@ -86,7 +92,7 @@ const EditExp = () => {
           className="w-full font-nuni text-[#11175D] text-sm font-bold"
           name="userpostPhoto"
           onChange={(event) => {
-            setImageUpload(event.target.files[0]);
+            setImageUpload(event.target.files[0]); 
           }}
         />
       </div>

@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 
 import { useSelector } from "react-redux";
 import NewPostCard from "./NewPostCard";
-import { getDatabase, ref, set, onValue, push } from "firebase/database";
+import { getDatabase, ref, onValue } from "firebase/database";
 
 const Head = () => {
   const settings = {
@@ -43,13 +43,19 @@ const Head = () => {
   let [userPost, setPost] = useState([]);
 
   useEffect(() => {
-    const userRef = ref(db, "userPost/");
+    const userRef = ref(
+      db,
+      "userPost/" + reduxReturnData.userStoreData.userInfo.uid
+    );
     onValue(userRef, (snapshot) => {
       let arr = [];
-      snapshot.forEach((item) => {
-        if (item.key !== reduxReturnData.userStoreData.userInfo.uid)
+      snapshot.forEach((item) => {    //problem here want to show other post
+        console.log(item);
+        if (item.key !== reduxReturnData.userStoreData.userInfo.uid) {
           arr.push({ ...item.val() });
-        console.log(item.key);
+
+          console.log(arr);
+        }
       });
       setPost(arr);
     });
@@ -86,7 +92,7 @@ const Head = () => {
               {userPost.map((item) => (
                 <div>
                   <NewPostCard
-                    title="Hi"
+                    title={""}
                     text={item.userPost}
                     postSrc={item.userpostPhoto}
                     fndSrc={item.userPhoto}

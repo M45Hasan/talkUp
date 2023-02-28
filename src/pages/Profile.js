@@ -31,6 +31,7 @@ import Slide from "../component/Slide";
 import EditProfile from "../component/EditProfile";
 import Container from "../component/Container";
 import EditExp from "../component/EditExp";
+import EduEdit from "../component/EduEdit";
 
 const Profile = () => {
   //############################ state start####
@@ -275,7 +276,6 @@ const Profile = () => {
       });
       setNew(arr);
     });
-  
   }, []);
   //#################################### cover Img end ###
 
@@ -284,7 +284,6 @@ const Profile = () => {
   let [expArr, setExpArr] = useState([]);
 
   let handleExpr = () => {
-    
     setExp(!expShow);
   };
   useEffect(() => {
@@ -295,29 +294,61 @@ const Profile = () => {
     onValue(userRef, (snapshot) => {
       let arr = [];
       snapshot.forEach((item) => {
-       ;
-
         arr.push({
           ...item.val(),
           id: item.key,
         });
-     
       });
       setExpArr(arr);
-      
     });
+    console.log("expArr:",expArr);
   }, []);
- 
 
   let handleDelete = (item) => {
-    console.log("ami delkete exp", item.id);
-    remove(def(db, "userExp/" + item.id));
+    console.log("ami id exp", item);
+
+    remove(
+      def(db, `userExp/${reduxReturnData.userStoreData.userInfo.uid}/${item}`)
+    );
+    console.log(item.id);
   };
   //############################################# Experience Edit end #####
 
   //############################################# Edu Edit start #####
   let [eduShow, setEdu] = useState(false);
+  let [eduArr, setEduArr] = useState([]);
 
+  let handleEdu = () => {
+    setEdu(!eduShow);
+  };
+
+  useEffect(() => {
+    const userRef = def(
+      db,
+      "userEdu/" + reduxReturnData.userStoreData.userInfo.uid
+    );
+    onValue(userRef, (snapshot) => {
+      let arr = [];
+      snapshot.forEach((item) => {
+        arr.push({
+          ...item.val(),
+          id: item.key,
+          
+        });
+      });
+      setEduArr(arr);
+    });
+    console.log("wduArr",eduArr);
+  }, []);
+
+  let handleDeleteEdu = (item) => {
+    console.log("ami id exp", item);
+
+    remove(
+      def(db, `userEdu/${reduxReturnData.userStoreData.userInfo.uid}/${item}`)
+    );
+    console.log(item.id);
+  };
   //############################################# edu Edit end #####
 
   return (
@@ -504,13 +535,14 @@ const Profile = () => {
                           time={item.time}
                           duration={item.dura}
                           details={item.about}
+                          blick={() => handleDelete(item.id)}
                         />
-                        <button
+                        {/* <button
                           onClick={() => handleDelete(item)}
-                          className="text-bar mt-5 absolute top-0 right-[20px] block font-medium text-base bg-[#0275B1] text-white hover:text-red-500 cursor-pointer hover:bg-cyan-500 px-2 rounded-lg "
+                          className="text-bar mt-5   block font-medium text-base bg-[#0275B1] text-white hover:text-red-500 cursor-pointer hover:bg-cyan-500 px-2 rounded-lg "
                         >
                           Delete
-                        </button>
+                        </button> */}
                       </div>
                     ))}
 
@@ -525,25 +557,31 @@ const Profile = () => {
                     <h3 className="font-bar font-bold text-[#181818] inline-block text-lg mr-10">
                       Education
                     </h3>
-                    {expArr.map((item) => (
-                      <div>
-                        <WorkExp
-                          className="w-[35px] h-[35px] rounded-full"
-                          jbName={item.job}
-                          time={item.time}
-                          duration={item.dura}
-                        />
-                        <button
-                          onClick={() => handleDelete(item)}
-                          className="text-bar mt-5 absolute top-0 right-[20px] block font-medium text-base bg-[#0275B1] text-white hover:text-red-500 cursor-pointer hover:bg-cyan-500 px-2 rounded-lg "
-                        >
-                          Delete
-                        </button>
-                      </div>
-                    ))}
+                    <ul>
+                      {eduArr.map((item) => (
+                        <li key={item.id}>
+                          <div>
+                            <WorkExp
+                              className="w-[35px] h-[35px] rounded-full"
+                              jbName={item.job}
+                              time={item.time}
+                              duration={item.dura}
+                              details={item.about}
+                              blick={() => handleDeleteEdu(item.id)}
+                            />
+                          </div>
 
+                          {/* <button
+                            onClick={() => handleDelete(item.id)}
+                            className="text-bar mt-5  top-0 right-[20px] block font-medium text-base bg-[#0275B1] text-white hover:text-red-500 cursor-pointer hover:bg-cyan-500 px-2 rounded-lg "
+                          >
+                            Delete
+                          </button> */}
+                        </li>
+                      ))}
+                    </ul>
                     <button
-                      onClick={handleExpr}
+                      onClick={handleEdu}
                       className="text-bar mt-5 absolute top-0 right-[90px] block font-medium text-base bg-[#0275B1] text-white cursor-pointer hover:bg-cyan-500 px-2 rounded-lg "
                     >
                       Add
@@ -829,10 +867,10 @@ const Profile = () => {
                 {/*header*/}
 
                 {/*body*/}
-                <EditExp />
+                <EduEdit />
                 {/*footer*/}
                 <div
-                  onClick={() => setExp(!eduShow)}
+                  onClick={() => setEdu(!eduShow)}
                   className="flex items-center justify-end p-6 border-t border-solid border-slate-200 rounded-b"
                 >
                   <button

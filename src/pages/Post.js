@@ -3,7 +3,16 @@ import Container from "../component/Container";
 
 import { FiSend } from "react-icons/fi";
 import { MdOutlineAddPhotoAlternate } from "react-icons/md";
-import { getDatabase, ref, set, onValue, push } from "firebase/database";
+import { ImCross } from "react-icons/im";
+import { useNavigate } from "react-router-dom";
+import {
+  getDatabase,
+  ref,
+  set,
+  onValue,
+  push,
+  remove,
+} from "firebase/database";
 import { useSelector } from "react-redux";
 import Image from "../component/Image";
 import {
@@ -13,8 +22,10 @@ import {
   getStorage,
 } from "firebase/storage";
 import SccroolButton from "../component/SccroolButton";
+import { v4 } from "uuid";
 
 const Post = () => {
+  let navigate = useNavigate();
   let reduxReturnData = useSelector((state) => state);
   let db = getDatabase();
   let [formData, setData] = useState({
@@ -27,8 +38,6 @@ const Post = () => {
     let { name, value } = e.target;
 
     setData({ ...formData, [name]: value });
-    console.log(formData);
-    console.log(formData.userText);
   };
 
   const [imageUpload, setImageUpload] = useState(null);
@@ -52,7 +61,7 @@ const Post = () => {
     } else {
       const imageRef = def(
         storage,
-        `userPostURL/${reduxReturnData.userStoreData.userInfo.uid}`
+        `userPostURL/${reduxReturnData.userStoreData.userInfo.uid} /${v4()}`
       );
 
       uploadBytes(imageRef, imageUpload).then((snapshot) => {
@@ -113,6 +122,14 @@ const Post = () => {
     });
     console.log("ami Location", useLoc);
   }, []);
+
+  let handlePostdel = (item) => {
+    console.log("postDel", item);
+
+    remove(
+      ref(db, `userPost/${reduxReturnData.userStoreData.userInfo.uid}/${item}`)
+    );
+  };
   //################################### database call end ########
   return (
     <>
@@ -158,6 +175,38 @@ const Post = () => {
                 </div>
               </div>
             </div>
+            <div className="flex justify-between w-max ">
+              <div className=" flex items-end w-[777px]">
+                <div className="w-[240px] flex items-center justify-center h-10 bg-[#FFFFFF] border  hover:bg-cyan-500  border-solid border-[#bab8b8] cursor-pointer">
+                  <p
+                    onClick={() => {
+                      navigate("/profile");
+                    }}
+                    className="font-bar font-medium font-base text-black"
+                  >
+                    Profile
+                  </p>{" "}
+                </div>
+                <div onClick={() => {
+                    navigate("/friends");
+                  }} className="cursor-pointer w-[240px] h-10 border bg-[#FFFFFF]  border-solid border-[#bab8b8]  hover:bg-cyan-500 flex items-center justify-center">
+                  {" "}
+                  <p className="font-bar font-medium font-base text-black">
+                    Friends
+                  </p>{" "}
+                </div>
+                <div
+                  
+                  className="cursor-pointer w-[240px] h-12 border bg-[#0E6795]  flex items-center justify-center"
+                >
+                  {" "}
+                  <p className="font-bar font-medium font-base text-white">
+                    Post
+                  </p>{" "}
+                </div>
+              </div>
+            </div>
+
             {userPost.map((item) => (
               <div className="mt-[25px] w-full px-6 py-[30px] bg-[#FFFF]">
                 <div className="flex justify-between items-center w-[150px] mb-[12px]">
@@ -178,11 +227,19 @@ const Post = () => {
                     ))}
                   </div>
                 </div>
-                {item.userText && (
-                  <p className="text-gray-700 text-base font-bar mb-4">
-                    {item.userText}
-                  </p>
-                )}
+                <div className="flex justify-between ">
+                  {item.userText && (
+                    <p className="text-gray-700 text-base font-bar mb-4">
+                      {item.userText}
+                    </p>
+                  )}
+                  <button
+                    onClick={() => handlePostdel(item.id)}
+                    className="text-bar self-baseline  font-medium text-base  text-[#0275B1] hover:text-red-500 cursor-pointer "
+                  >
+                    <ImCross />
+                  </button>
+                </div>
                 {item.userpostPhoto && (
                   <image className="w-[700px] h-[300px]">
                     <Image
