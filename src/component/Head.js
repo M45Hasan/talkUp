@@ -45,13 +45,13 @@ const Head = () => {
   useEffect(() => {
     const userRef = ref(
       db,
-      "userPost/" + reduxReturnData.userStoreData.userInfo.uid
+      "userPost"
     );
     onValue(userRef, (snapshot) => {
       let arr = [];
       snapshot.forEach((item) => {    //problem here want to show other post
         console.log(item);
-        if (item.key !== reduxReturnData.userStoreData.userInfo.uid) {
+        if (item.val().pid !== reduxReturnData.userStoreData.userInfo.uid) {
           arr.push({ ...item.val() });
 
           console.log(arr);
@@ -93,7 +93,7 @@ const Head = () => {
                 <div>
                   <NewPostCard
                     title={""}
-                    text={item.userPost}
+                    text={item.userText}
                     postSrc={item.userpostPhoto}
                     fndSrc={item.userPhoto}
                   />

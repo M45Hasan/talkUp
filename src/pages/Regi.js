@@ -114,7 +114,7 @@ const Regi = () => {
         formData.photoURL
       )
         .then((user) => {
-           sendEmailVerification(auth.currentUser).then(() => {
+          sendEmailVerification(auth.currentUser).then(() => {
             console.log(user.user);
             updateProfile(auth.currentUser, {
               displayName: formData.fname,
@@ -128,6 +128,8 @@ const Regi = () => {
                   displayName: user.user.displayName,
                   email: user.user.email,
                   photoURL: user.user.photoURL,
+                  location: "",
+                  about: "",
                 });
               })
               .then(() => {
@@ -143,8 +145,7 @@ const Regi = () => {
                 // An error occurred
                 // ...
               });
-            });
-
+          });
         })
         .catch((error) => {
           const errorCode = error.code;

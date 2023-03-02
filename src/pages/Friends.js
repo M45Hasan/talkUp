@@ -26,7 +26,9 @@ const Friends = () => {
     onValue(userref, (snapshot) => {
       let arr = [];
       snapshot.forEach((item) => {
-        arr.push({ ...item.val() });
+        if (item.key !== reduxReturnData.userStoreData.userInfo.uid) {
+          arr.push({ ...item.val() });
+        }
       });
       setUserList(arr);
     });
@@ -65,6 +67,17 @@ const Friends = () => {
               Post
             </p>{" "}
           </div>
+          <div
+            onClick={() => {
+              navigate("/feed");
+            }}
+            className="cursor-pointer w-[100px] h-10 border  hover:bg-cyan-500 bg-[#FFFFFF] border-solid border-[#bab8b8] flex items-center justify-center"
+          >
+            {" "}
+            <p className="font-bar font-medium font-base text-black">
+              Feeds
+            </p>{" "}
+          </div>
         </div>
       </div>
       <Container>
@@ -77,7 +90,7 @@ const Friends = () => {
                 </h3>
                 {userList.map((item) => (
                   <div className="mb-3 border-b pb-1 w-[120px] border-black ">
-                    <div className="flex w-[80px] justify-between ">
+                    <div className="flex w-[85px] justify-between ">
                       {item.photoURL ? (
                         <image>
                           <Image
@@ -93,9 +106,14 @@ const Friends = () => {
                           />
                         </image>
                       )}
-                      <h4 className="font-bar font-bold text-[12px]">
-                        {item.displayName}
-                      </h4>
+                      <div className="ml-1">
+                        <h4 className="font-bar font-bold text-[12px]">
+                          {item.displayName}
+                        </h4>
+                        <p className="font-bar font-semibold text-[10px] text-[#181818]">
+                          @ {item.about}
+                        </p>
+                      </div>
                     </div>
                   </div>
                 ))}

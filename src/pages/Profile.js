@@ -72,7 +72,7 @@ const Profile = () => {
   //#################################### cover #######
   const [showCov, setShowCov] = useState(false);
   const [showMod, setShowMod] = useState(false);
-  const [cover, setCover] = useState("");
+  
   const [coverCrp, setCoverCrp] = useState();
   const [dataCover, setDCover] = useState();
   const [imaCover, setImacov] = useState();
@@ -110,7 +110,7 @@ const Profile = () => {
     console.log("ami");
     setShowCov(true);
   };
-  let handleFriend = () => {};
+  
 
   let handleProfileEdit = () => {
     setProfileEdit(!profileEdit);
@@ -266,7 +266,7 @@ const Profile = () => {
   }, []);
 
   useEffect(() => {
-    const userRef = def(db, "userInfo");
+    const userRef = def(db, "users");
     onValue(userRef, (snapshot) => {
       let arr = [];
       snapshot.forEach((item) => {
@@ -454,6 +454,17 @@ const Profile = () => {
                       {" "}
                       <p className="font-bar font-medium font-base text-black">
                         Post
+                      </p>{" "}
+                    </div>
+                    <div
+                      onClick={() => {
+                        navigate("/feed");
+                      }}
+                      className="cursor-pointer w-[100px] h-10 border  hover:bg-cyan-500 bg-[#FFFFFF] border-solid border-[#bab8b8] flex items-center justify-center"
+                    >
+                      {" "}
+                      <p className="font-bar font-medium font-base text-black">
+                        Feeds
                       </p>{" "}
                     </div>
                   </div>

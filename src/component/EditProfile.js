@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { getDatabase, ref, set, push } from "firebase/database";
+import { getDatabase, ref, set, update, onValue } from "firebase/database";
 import { useSelector } from "react-redux";
 
 const EditProfile = () => {
@@ -18,10 +18,25 @@ const EditProfile = () => {
     console.log(data);
   };
   let handleProfile123 = () => {
-    set(ref(db, "userInfo/" + reduxReturnData.userStoreData.userInfo.uid), {
+    update(ref(db, "users/" + reduxReturnData.userStoreData.userInfo.uid), {
       location: data.add,
       about: data.about,
     });
+
+    const userRef = ref(db, "userPost");
+
+    onValue(userRef, (snapshot) => {
+      let arr = [];
+      snapshot.forEach((item) => {
+        if (item.val().pid == reduxReturnData.userStoreData.userInfo.uid) {
+          update(ref(db, `userPost/${item.key}`), {
+            location: data.add,
+            about: data.about,
+          });
+        }
+      });
+    });
+
     setShow(!editShow);
   };
 

@@ -2,17 +2,14 @@ import React from "react";
 import { AiTwotoneLike } from "react-icons/ai";
 
 import Image from "./Image";
-
+import { useNavigate } from "react-router-dom";
 
 const NewPostCard = ({ text, title, postSrc, fndSrc }) => {
-  
+  let navigate = useNavigate();
 
   return (
-    
     <div>
-      
       <div className={!postSrc == "" ? "relative  mb-3" : "relative mb-4 "}>
-
         {postSrc && (
           <img
             className="rounded-t-lg w-[400px] h-[200px]"
@@ -34,9 +31,15 @@ const NewPostCard = ({ text, title, postSrc, fndSrc }) => {
           )}
           <p className="text-gray-700 text-base font-bar mb-4">{text}</p>
           <div className="flex gap-x-5 w-full">
-            <p className="cursor-pointer text-base font-bar p-1 text-white font-semibold rounded-lg hover:bg-cyan-500 bg-[#0E6795]">
-              View
-            </p>
+            <div
+              onClick={() => {
+                navigate("/feed");
+              }}
+            >
+              <p className="cursor-pointer text-base font-bar p-1 text-white font-semibold rounded-lg hover:bg-cyan-500 bg-[#0E6795]">
+                View
+              </p>
+            </div>
             <p className=" cursor-pointer text-end text-base font-bar p-1  text-white font-semibold rounded-lg hover:bg-cyan-500 bg-[#0E6795]">
               <AiTwotoneLike />
             </p>

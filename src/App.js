@@ -5,8 +5,7 @@ import {
   createBrowserRouter,
   createRoutesFromElements,
   RouterProvider,
- 
-  Route
+  Route,
 } from "react-router-dom";
 import Profile from "./pages/Profile";
 import Regi from "./pages/Regi";
@@ -16,6 +15,7 @@ import Friends from "./pages/Friends";
 
 import RootLayout from "./pages/RootLayout";
 import Post from "./pages/Post";
+import Feed from "./pages/Feed";
 
 function App() {
   let router = createBrowserRouter(
@@ -28,6 +28,7 @@ function App() {
           <Route path="/profile" element={<Profile />} />
           <Route path="/friends" element={<Friends />} />
           <Route path="/post" element={<Post />} />
+          <Route path="/feed" element={<Feed />} />
         </Route>
       </Route>
     )

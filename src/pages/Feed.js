@@ -24,7 +24,7 @@ import {
 import SccroolButton from "../component/SccroolButton";
 import { v4 } from "uuid";
 
-const Post = () => {
+const Feed = () => {
   let navigate = useNavigate();
   let reduxReturnData = useSelector((state) => state);
   let db = getDatabase();
@@ -86,47 +86,35 @@ const Post = () => {
   };
   //################################### database call start ########
   let [userPost, setPost] = useState([]);
+  // let [delShow, setDel] = useState(false);
   useEffect(() => {
-    const userRef = ref(
-      db,
-      "userPost"
-    );
+    const userRef = ref(db, "userPost");
     onValue(userRef, (snapshot) => {
       let arr = [];
       snapshot.forEach((item) => {
-        if(item.val().pid==reduxReturnData.userStoreData.userInfo.uid){
-        arr.push({ ...item.val() , uid:item.key });
+        console.log("ami pid:", item.val().pid);
+
+        if (item.val().pid == reduxReturnData.userStoreData.userInfo.uid) {
+          arr.push({ ...item.val(), uid: item.key, del: "true" });
+
+          // setDel(!delShow);
+        } else {
+          arr.push({ ...item.val(), uid: item.key, del: "false" });
         }
-        console.log(item.val().pid)
       });
       setPost(arr);
     });
     console.log("ami Post arr", userPost);
   }, []);
 
-  let [useLoc, setLoc] = useState([]);
-  useEffect(() => {
-    const userRef = ref(db, "users");
-    onValue(userRef, (snapshot) => {
-      let arr = [];
-      snapshot.forEach((item) => {
-        if (item.key == reduxReturnData.userStoreData.userInfo.uid) {
-          arr.push({ ...item.val() });
-        }
-      });
-      setLoc(arr);
-    });
-    console.log("ami Location", useLoc);
-  }, []);
+  // let [useLoc, setLoc] = useState([]);
 
   let handlePostdel = (item) => {
-    console.log("postDel", item.uid);
-
-    remove(
-      ref(db, `userPost/${item.uid}`)
-    );
+    console.log("postDel", item.pid);
+    if (item.pid == reduxReturnData.userStoreData.userInfo.uid) {
+      remove(ref(db, `userPost/${item.uid}`));
+    }
   };
-  //################################### database call end ########
   return (
     <>
       <Container>
@@ -194,21 +182,15 @@ const Post = () => {
                     Friends
                   </p>{" "}
                 </div>
-                <div className="cursor-pointer w-[240px] h-12 border bg-[#0E6795]  flex items-center justify-center">
-                  {" "}
-                  <p className="font-bar font-medium font-base text-white">
-                    Post
-                  </p>{" "}
-                </div>
                 <div
                   onClick={() => {
-                    navigate("/feed");
+                    navigate("/post");
                   }}
-                  className="cursor-pointer w-[100px] h-10 border  hover:bg-cyan-500 bg-[#FFFFFF] border-solid border-[#bab8b8] flex items-center justify-center"
+                  className="cursor-pointer w-[240px] h-10 border bg-[#FFFFFF]  border-solid border-[#bab8b8]  hover:bg-cyan-500 flex items-center justify-center"
                 >
                   {" "}
                   <p className="font-bar font-medium font-base text-black">
-                    Feeds
+                    Post
                   </p>{" "}
                 </div>
               </div>
@@ -217,21 +199,24 @@ const Post = () => {
             {userPost.map((item) => (
               <div className="mt-[25px] w-full px-6 py-[30px] bg-[#FFFF]">
                 <div className="flex justify-between items-center w-[150px] mb-[12px]">
-                  <image className="">
-                    <Image
-                      className="w-[42px] h-[42px] rounded-full"
-                      imgSrc={item.userPhoto}
-                    />
-                  </image>
+                  {item.userPhoto && (
+                    <image className="">
+                      <Image
+                        className="w-[42px] h-[42px] rounded-full"
+                        imgSrc={item.userPhoto}
+                      />
+                    </image>
+                  )}
+
                   <div className="w-[100px]">
                     <h4 className="font-bar font-bold mt-[-15px] text-[12px]">
                       {item.userName}
                     </h4>
-                    {useLoc.map((item) => (
+                    {item.about && (
                       <p className="font-bar font-semibold text-[10px] text-[#181818]">
                         @ {item.about}
                       </p>
-                    ))}
+                    )}
                   </div>
                 </div>
                 <div className="flex justify-between ">
@@ -240,12 +225,14 @@ const Post = () => {
                       {item.userText}
                     </p>
                   )}
-                  <button
-                    onClick={() => handlePostdel(item)}
-                    className="text-bar self-baseline  font-medium text-base  text-[#0275B1] hover:text-red-500 cursor-pointer "
-                  >
-                    <ImCross />
-                  </button>
+                  {item.del == "true" && (
+                    <button
+                      onClick={() => handlePostdel(item)}
+                      className="text-bar self-baseline  font-medium text-base  text-[#0275B1] hover:text-red-500 cursor-pointer "
+                    >
+                      <ImCross />
+                    </button>
+                  )}
                 </div>
                 {item.userpostPhoto && (
                   <image className="w-[700px] h-[300px]">
@@ -257,6 +244,7 @@ const Post = () => {
                 )}
               </div>
             ))}
+            
           </div>
         </div>
         <SccroolButton />
@@ -265,4 +253,4 @@ const Post = () => {
   );
 };
 
-export default Post;
+export default Feed;
