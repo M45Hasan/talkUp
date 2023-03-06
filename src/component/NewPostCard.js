@@ -9,10 +9,10 @@ const NewPostCard = ({ text, title, postSrc, fndSrc }) => {
 
   return (
     <div>
-      <div className={!postSrc == "" ? "relative  mb-3" : "relative mb-4 "}>
+      <div className={!postSrc === "" ? "relative  mb-3" : "relative mb-4 "}>
         {postSrc && (
           <img
-            className="rounded-t-lg w-[400px] h-[200px]"
+            className="rounded-t-lg object-cover w-[200px] h-[200px]"
             src={postSrc}
             alt="card"
           />

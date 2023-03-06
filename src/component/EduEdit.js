@@ -14,7 +14,7 @@ const EduEdit = () => {
     about: "",
   });
 
-  let handleChange = (e) => {
+  let handleChange = (e) => { 
     setShow(false);
 
     let { name, value } = e.target;

@@ -14,7 +14,7 @@ import { useNavigate } from "react-router-dom";
 
 import { activeUser } from "../slices/UserSlice";
 import { useSelector, useDispatch } from "react-redux";
-import { getDatabase, ref, set, push } from "firebase/database";
+import { getDatabase} from "firebase/database";
 
 const Sign = () => {
   // ####################################### import variable#####
@@ -75,7 +75,7 @@ const Sign = () => {
             localStorage.setItem(
               "userInfo",
               JSON.stringify(userCredential.user)
-            );
+            ); 
             dispatch(activeUser(userCredential.user));
             setTimeout(() => {
               navigate("/profile");

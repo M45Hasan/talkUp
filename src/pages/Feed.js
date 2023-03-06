@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import Container from "../component/Container";
 
 import { FiSend } from "react-icons/fi";
@@ -6,12 +6,19 @@ import { MdOutlineAddPhotoAlternate } from "react-icons/md";
 import { ImCross } from "react-icons/im";
 import { useNavigate } from "react-router-dom";
 import {
+  AiTwotoneLike,
+  AiOutlineCloseSquare,
+  AiFillDislike,
+} from "react-icons/ai";
+
+import {
   getDatabase,
   ref,
   set,
   onValue,
   push,
   remove,
+  update,
 } from "firebase/database";
 import { useSelector } from "react-redux";
 import Image from "../component/Image";
@@ -86,20 +93,17 @@ const Feed = () => {
   };
   //################################### database call start ########
   let [userPost, setPost] = useState([]);
-  // let [delShow, setDel] = useState(false);
+
   useEffect(() => {
     const userRef = ref(db, "userPost");
     onValue(userRef, (snapshot) => {
       let arr = [];
       snapshot.forEach((item) => {
-        console.log("ami pid:", item.val().pid);
-
-        if (item.val().pid == reduxReturnData.userStoreData.userInfo.uid) {
-          arr.push({ ...item.val(), uid: item.key, del: "true" });
-
-          // setDel(!delShow);
+        console.log(item.val());
+        if (item.val().pid === reduxReturnData.userStoreData.userInfo.uid) {
+          arr.push({ ...item.val(), uid: item.key });
         } else {
-          arr.push({ ...item.val(), uid: item.key, del: "false" });
+          arr.push({ ...item.val(), uid: item.key });
         }
       });
       setPost(arr);
@@ -107,14 +111,123 @@ const Feed = () => {
     console.log("ami Post arr", userPost);
   }, []);
 
-  // let [useLoc, setLoc] = useState([]);
-
   let handlePostdel = (item) => {
     console.log("postDel", item.pid);
-    if (item.pid == reduxReturnData.userStoreData.userInfo.uid) {
+    console.log("postUid", item.uid);
+    if (item.pid === reduxReturnData.userStoreData.userInfo.uid) {
       remove(ref(db, `userPost/${item.uid}`));
+      console.log("delete success");
+    } else {
+      console.log("delete hoy ny");
     }
   };
+
+  //################################### Comment Start #########
+
+  let [lnew, setlNew] = useState("");
+  let handleOpen = (item) => {
+    setlNew(item.uid);
+  };
+  let handleClose = (item) => {
+    setlNew("667");
+  };
+
+  //################################### Comment end #########
+
+  //################################### like Start #########
+
+  let handleLike = (item) => {
+    console.log("like:", item);
+
+    set(push(ref(db, "userLike/")), {
+      postId: item.uid,
+      postmanId: item.pid,
+      postman: item.userName,
+      postmanURL: item.userPhoto,
+      likerId: reduxReturnData.userStoreData.userInfo.uid,
+      likerURL: reduxReturnData.userStoreData.userInfo.photoURL,
+      likerName: reduxReturnData.userStoreData.userInfo.displayName,
+    });
+  };
+
+  let handleDisL = (item) => {
+    likeCount.forEach((e) => {
+      console.log(e);
+      if (
+        e.likerId === reduxReturnData.userStoreData.userInfo.uid &&
+        e.postId === item.uid
+      ) {
+        remove(ref(db, "userLike/" + e.lid));
+      }
+    });
+  };
+
+  let [likeCount, setCount] = useState([]);
+
+  useEffect(() => {
+    const userRef = ref(db, "userLike/");
+
+    onValue(userRef, (snapshot) => {
+      let arr = [];
+      snapshot.forEach((item) => {
+        arr.push({ ...item.val(), lid: item.key });
+      });
+
+      setCount(arr);
+    });
+  }, []);
+  console.log(likeCount);
+  //################################################ users map stsrt
+  let [showUser, setUser] = useState();
+
+  useEffect(() => {
+    const useRef = ref(db, "users");
+
+    onValue(useRef, (snapshot) => {
+      let arr = [];
+      snapshot.forEach((item) => {
+        arr.push({ ...item.val(), uid: item.key });
+      });
+      setUser(arr);
+    });
+  }, [db]); // render problem
+  console.log(showUser);
+
+  //################################################ users map end
+  let [modLike, setModLike] = useState("");
+  let [myLiker, setMyLiker] = useState([]);
+
+  let handleLiker = (item) => {
+    setModLike(item.uid);
+
+    console.log(item.uid);
+    let arr = [];
+
+    likeCount.forEach((likeCow) => {
+      showUser.forEach((usShow) => {
+        if (likeCow.likerId === usShow.uid && item.uid === likeCow.postId) {
+          arr.push({
+            likerId: likeCow.likerId,
+            likerName: likeCow.likerName,
+            likerURL: likeCow.likerURL,
+            about: usShow.about,
+          });
+        }
+      });
+    });
+
+    console.log(arr);
+
+    setMyLiker(arr);
+  };
+
+  console.log(myLiker);
+
+  let modClose = (item) => {
+    setModLike("1234");
+  };
+  //################################### Like end #########
+
   return (
     <>
       <Container>
@@ -196,7 +309,7 @@ const Feed = () => {
               </div>
             </div>
 
-            {userPost.map((item) => (
+            {userPost?.slice(0).reverse().map((item) => (
               <div className="mt-[25px] w-full px-6 py-[30px] bg-[#FFFF]">
                 <div className="flex justify-between items-center w-[150px] mb-[12px]">
                   {item.userPhoto && (
@@ -225,7 +338,7 @@ const Feed = () => {
                       {item.userText}
                     </p>
                   )}
-                  {item.del == "true" && (
+                  {item.pid === reduxReturnData.userStoreData.userInfo.uid && (
                     <button
                       onClick={() => handlePostdel(item)}
                       className="text-bar self-baseline  font-medium text-base  text-[#0275B1] hover:text-red-500 cursor-pointer "
@@ -242,9 +355,108 @@ const Feed = () => {
                     />
                   </image>
                 )}
+                <div className="flex w-full h-[20px] flex-row-reverse gap-x-5 items-center  mt-4">
+                  {" "}
+                  <div onClick={() => handleOpen(item)}>
+                    <p className=" cursor-pointer text-end text-base font-bar p-1  text-[#0E6795] font-semibold rounded-lg hover:text-cyan-500 ">
+                      Comment
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-x-2 w-[100px]">
+                    <div className="w-[30%]" onClick={() => handleLike(item)}>
+                      <p className=" cursor-pointer text-end text-base font-bar p-1  text-[#0E6795] font-semibold rounded-lg hover:text-cyan-500 ">
+                        <AiTwotoneLike />
+                      </p>
+                    </div>
+                    <div
+                      className=" w-[40%] "
+                      onClick={() => handleLiker(item)}
+                    >
+                      <p className="border-[1px] hover:rounded-[2px] rounded-md border-[#0E6795] cursor-pointer text-center text-sm font-bar px-[2px]  text-[#0E6795] font-semibold hover:text-cyan-500">
+                        {" "}
+                        {likeCount.filter((e) => e.postId === item.uid).length}
+                      </p>
+                    </div>
+                    {/* ########################################### modal start */}
+                    {modLike === item.uid && (
+                      <>
+                        <div
+                          onClick={() => modClose(item)}
+                          className="justify-center border-4 rounded-lg border-solid border-[#0E6795] items-center flex overflow-x-hidden fixed inset-0 z-50 outline-none focus:outline-none"
+                        >
+                          <div className="relative w-auto my-6 mx-auto max-w-3xl">
+                            {/*content*/}
+                            <div className="border-2 rounded-lg border-[#0E6795] shadow-xl dark:text-white relative flex flex-col w-[280px] h-[300px] bg-white outline-none focus:outline-none">
+                              {/*header*/}
+
+                              {/*body*/}
+                              <div
+                                className="relative p-6 dark:bg-gray-700 flex-auto overflow-y-scroll scrollbar-red-500 "
+                                style={{
+                                  scrollBehavior: "smooth",
+                                  scrollbarColor: "green",
+                                }}
+                              >
+                                {myLiker.map((tem) => (
+                                  <div className="mb-3 border-b pb-[6px] w-[200px] border-black ">
+                                    <div className="flex w-full gap-x-2 ">
+                                      {tem.likerURL ? (
+                                        <image>
+                                          <Image
+                                            className="w-[42px] h-[42px] rounded-full"
+                                            imgSrc={tem.likerURL}
+                                          />
+                                        </image>
+                                      ) : (
+                                        <image>
+                                          <Image
+                                            className="w-[42px] h-[42px] rounded-full"
+                                            imgSrc="assets/wx1.png"
+                                          />
+                                        </image>
+                                      )}
+                                      <div className="ml-1 w-[100px]">
+                                        <h4 className="font-bar font-bold text-[12px]">
+                                          {tem.likerName}
+                                        </h4>
+                                        <p className="font-bar font-semibold text-[10px] text-[#181818] dark:text-white">
+                                          @ {tem.about}
+                                        </p>
+                                      </div>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                              {/*footer*/}
+                              <div className="flex items-center justify-end p-2 border-t bg-slate-500 border-solid border-slate-200 rounded-b"></div>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="opacity-25 fixed inset-0 z-40 bg-black"></div>
+                      </>
+                    )}
+                    {/* ########################################### modal end*/}
+                    <div className="w-[30%]" onClick={() => handleDisL(item)}>
+                      <p className=" cursor-pointer text-end text-base font-bar p-1  text-[#0E6795] font-semibold rounded-lg hover:text-orange-700 ">
+                        <AiFillDislike />
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                {lnew === item.uid && (
+                  <div className="w-full h-10 border-[2px] border-[#0E6795]  mt-2 relative">
+                    <div
+                      className=" absolute right-0 bottom-0"
+                      onClick={() => handleClose(item)}
+                    >
+                      <p className=" cursor-pointer text-end text-base font-bar   text-[#973333] font-semibold rounded-lg hover:text-red-500 ">
+                        <AiOutlineCloseSquare />
+                      </p>
+                    </div>
+                  </div>
+                )}
               </div>
             ))}
-            
           </div>
         </div>
         <SccroolButton />

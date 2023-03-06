@@ -2,14 +2,16 @@ import React, { useState, useEffect } from "react";
 import Slider from "react-slick";
 import Image from "./Image";
 import Topic from "./Topic";
+import { ImCross } from "react-icons/im";
 
-import { getDatabase, ref, set, push, onValue } from "firebase/database";
+import { getDatabase, ref, set, push, onValue, remove } from "firebase/database";
 import { useSelector } from "react-redux";
 import {
   ref as def,
   uploadBytes,
   getDownloadURL,
   getStorage,
+ 
 } from "firebase/storage";
 import { v4 } from "uuid";
 
@@ -65,7 +67,7 @@ const Slide = () => {
       set(push(ref(db, "userProj")), {
         about: formData.about,
         link: formData.link,
-        uid: reduxReturnData.userStoreData.userInfo.uid,
+        pid: reduxReturnData.userStoreData.userInfo.uid,
       }).catch((error) => {
         console.log(error.code);
       });
@@ -81,7 +83,7 @@ const Slide = () => {
           set(push(ref(db, "userProj")), {
             about: formData.about,
             link: formData.link,
-            uid: reduxReturnData.userStoreData.userInfo.uid,
+            pid: reduxReturnData.userStoreData.userInfo.uid,
             projURL: url,
           }).catch((error) => {
             console.log(error.code);
@@ -99,14 +101,22 @@ const Slide = () => {
       let arr = [];
 
       snapshot.forEach((item) => {
-        if (item.val().uid == reduxReturnData.userStoreData.userInfo.uid) {
-          arr.push({ ...item.val() });
+        if (item.val().pid == reduxReturnData.userStoreData.userInfo.uid) {
+          arr.push({ ...item.val(),uid:item.key });
         }
       });
       setProj(arr);
     });
   }, []);
 
+  let handledel=(item)=>{
+     console.log("proj:",item.uid)
+     console.log("proj:",item.pid)
+     if(item.pid==reduxReturnData.userStoreData.userInfo.uid){
+      remove(ref(db,`userProj/${item.uid}`))
+
+     }
+  }
   return (
     <>
       {" "}
@@ -123,13 +133,10 @@ const Slide = () => {
       <div className=" w-full h-[300px]  ">
         <Slider {...settings} className=" mt-5">
           {arrProj.map((item) => (
-            <div className="border-[2px] w-[200px] h-[210px] rounded-lg border-cyan-500 border-solid ">
+            <div className="border-[2px] relative w-[200px] h-[210px] rounded-lg border-cyan-500 border-solid ">
               {" "}
               {item.projURL && (
-                <Image
-                  className="w-[180px] h-[160px] "
-                  imgSrc={item.projURL}
-                />
+                <Image className="w-[180px] h-[160px] " imgSrc={item.projURL} />
               )}
               {item.about && (
                 <p className="text-bar text-center font-medium text-[#0275B1]  text-base">
@@ -146,11 +153,14 @@ const Slide = () => {
                   My Project
                 </a>
               )}
+              <button
+                onClick={()=>handledel(item)}
+                className="text-bar absolute top-2 right-2  block font-medium text-base  text-[#0275B1] hover:text-red-500 cursor-pointer bg-orange-400 shadow rounded-lg "
+              >
+                <ImCross />
+              </button>
             </div>
           ))}
-          
-        
-       
         </Slider>
       </div>
       {projShow ? (

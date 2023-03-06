@@ -26,6 +26,7 @@ import {
   set,
   onValue,
   remove,
+  update,
 } from "firebase/database";
 import Slide from "../component/Slide";
 import EditProfile from "../component/EditProfile";
@@ -47,7 +48,6 @@ const Profile = () => {
     }
   }, []);
 
-  let [seeWrite, setWrite] = useState("");
   let [seeShow, setSee] = useState(false);
   let [editShow, setEdit] = useState(false);
   let [postShow, setPost] = useState(false);
@@ -72,7 +72,7 @@ const Profile = () => {
   //#################################### cover #######
   const [showCov, setShowCov] = useState(false);
   const [showMod, setShowMod] = useState(false);
-  
+
   const [coverCrp, setCoverCrp] = useState();
   const [dataCover, setDCover] = useState();
   const [imaCover, setImacov] = useState();
@@ -88,6 +88,8 @@ const Profile = () => {
     setSee(!seeShow);
   };
 
+  let [seeWrite, setWrite] = useState("");
+
   let handleWrite = (e) => {
     setWrite(e.target.value);
     console.log(seeWrite);
@@ -100,6 +102,7 @@ const Profile = () => {
     setPost(!postShow);
     setEdit(true);
     setSee(!seeShow);
+    console.log(seeWrite);
   };
 
   let handleCrop = () => {
@@ -110,7 +113,6 @@ const Profile = () => {
     console.log("ami");
     setShowCov(true);
   };
-  
 
   let handleProfileEdit = () => {
     setProfileEdit(!profileEdit);
@@ -270,6 +272,7 @@ const Profile = () => {
     onValue(userRef, (snapshot) => {
       let arr = [];
       snapshot.forEach((item) => {
+        
         if (item.key == reduxReturnData.userStoreData.userInfo.uid) {
           arr.push({ ...item.val() });
         }
@@ -301,7 +304,7 @@ const Profile = () => {
       });
       setExpArr(arr);
     });
-    console.log("expArr:",expArr);
+    console.log("expArr:", expArr);
   }, []);
 
   let handleDelete = (item) => {
@@ -333,12 +336,11 @@ const Profile = () => {
         arr.push({
           ...item.val(),
           id: item.key,
-          
         });
       });
       setEduArr(arr);
     });
-    console.log("wduArr",eduArr);
+    console.log("wduArr", eduArr);
   }, []);
 
   let handleDeleteEdu = (item) => {
@@ -350,6 +352,10 @@ const Profile = () => {
     console.log(item.id);
   };
   //############################################# edu Edit end #####
+
+  //############################################# about Edit start #####
+
+  //############################################# asbout Edit end #####
 
   return (
     <>
@@ -468,6 +474,7 @@ const Profile = () => {
                       </p>{" "}
                     </div>
                   </div>
+
                   {!seeShow ? (
                     <div className="h-[170px] bg-white border border-solid border-[#bab8b8] w-full mt-7 p-7">
                       <h3 className="font-bar font-bold text-lg">About</h3>

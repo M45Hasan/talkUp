@@ -13,7 +13,7 @@ import {
   push,
   remove,
 } from "firebase/database";
-import { useSelector } from "react-redux";
+
 import Image from "../component/Image";
 import {
   ref as def,
@@ -23,11 +23,16 @@ import {
 } from "firebase/storage";
 import SccroolButton from "../component/SccroolButton";
 import { v4 } from "uuid";
+import { getAuth, updateProfile } from "firebase/auth";
+import { useSelector, useDispatch } from "react-redux";
+import { activeUser } from "../slices/UserSlice";
 
 const Post = () => {
+  let dispatch = useDispatch();
   let navigate = useNavigate();
   let reduxReturnData = useSelector((state) => state);
   let db = getDatabase();
+  const auth = getAuth();
   let [formData, setData] = useState({
     userPhoto: reduxReturnData.userStoreData.userInfo.photoURL,
     userName: reduxReturnData.userStoreData.userInfo.displayName,
@@ -87,17 +92,14 @@ const Post = () => {
   //################################### database call start ########
   let [userPost, setPost] = useState([]);
   useEffect(() => {
-    const userRef = ref(
-      db,
-      "userPost"
-    );
+    const userRef = ref(db, "userPost");
     onValue(userRef, (snapshot) => {
       let arr = [];
       snapshot.forEach((item) => {
-        if(item.val().pid==reduxReturnData.userStoreData.userInfo.uid){
-        arr.push({ ...item.val() , uid:item.key });
+        if (item.val().pid == reduxReturnData.userStoreData.userInfo.uid) {
+          arr.push({ ...item.val(), uid: item.key });
         }
-        console.log(item.val().pid)
+        console.log(item.val().pid);
       });
       setPost(arr);
     });
@@ -112,6 +114,7 @@ const Post = () => {
       snapshot.forEach((item) => {
         if (item.key == reduxReturnData.userStoreData.userInfo.uid) {
           arr.push({ ...item.val() });
+      
         }
       });
       setLoc(arr);
@@ -122,9 +125,7 @@ const Post = () => {
   let handlePostdel = (item) => {
     console.log("postDel", item.uid);
 
-    remove(
-      ref(db, `userPost/${item.uid}`)
-    );
+    remove(ref(db, `userPost/${item.uid}`));
   };
   //################################### database call end ########
   return (

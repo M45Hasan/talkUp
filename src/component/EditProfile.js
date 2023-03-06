@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { getDatabase, ref, set, update, onValue } from "firebase/database";
 import { useSelector } from "react-redux";
 
@@ -22,23 +22,32 @@ const EditProfile = () => {
       location: data.add,
       about: data.about,
     });
+     postU.forEach((e)=>{
 
-    const userRef = ref(db, "userPost");
+    
+    if (e.pid === reduxReturnData.userStoreData.userInfo.uid) {
+      update(ref(db, `userPost/${e.lk}`), {
+        location: data.add,
+        about: data.about,
+      });
+    }
+  })
+    setShow(!editShow);
+  };
+
+  let [postU, setUpost] = useState([]);
+  useEffect(() => {
+    const userRef = ref(db, "userPost/");
 
     onValue(userRef, (snapshot) => {
       let arr = [];
       snapshot.forEach((item) => {
-        if (item.val().pid == reduxReturnData.userStoreData.userInfo.uid) {
-          update(ref(db, `userPost/${item.key}`), {
-            location: data.add,
-            about: data.about,
-          });
-        }
+        arr.push({ ...item.val(), lk: item.key });
       });
+      setUpost(arr);
     });
-
-    setShow(!editShow);
-  };
+  }, []);
+  console.log(postU);
 
   return (
     <div className="w-[400px] h-[300px] border border-solid border-cyan-500 rounded-md relative p-6 flex-auto">

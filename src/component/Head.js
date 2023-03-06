@@ -86,10 +86,10 @@ const Head = () => {
           </div>
         </nav>
 
-        <div className="block absolute top-8 right-0 translate-x-[-15%] translate-y-[12%]">
+        <div className=" absolute top-8 right-0 translate-x-[-15%] translate-y-[30%]">
           <div className="rounded-lg shadow-lg bg-white w-[302px]">
             <Slider {...settings} className="">
-              {userPost.map((item) => (
+              {userPost.reverse().map((item) => (
                 <div>
                   <NewPostCard
                     title={""}
