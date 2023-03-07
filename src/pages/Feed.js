@@ -258,9 +258,8 @@ const Feed = () => {
         commentarId: reduxReturnData.userStoreData.userInfo.uid,
         commentarURL: reduxReturnData.userStoreData.userInfo.photoURL,
         commentText: comData.comInput,
-      }).then(()=>{
-        comData.comInput=""
-        
+      }).then(() => {
+        comData.comInput = "";
       })
     );
   };
@@ -439,7 +438,10 @@ const Feed = () => {
                     </image>
                   )}
                   <div className="flex w-full h-[20px] flex-row-reverse gap-x-5 items-center  mt-4">
-                    {" "}
+                    <p className="border-[1px]  hover:rounded-[2px] rounded-md border-[#0E6795] cursor-pointer text-center text-sm font-bar px-[2px]  text-[#0E6795] font-semibold hover:text-cyan-500">
+                      {" "}
+                      {comArr.filter((e) => item.uid === e.postId).length}{" "}
+                    </p>
                     <div onClick={() => handleOpen(item)}>
                       <p className=" cursor-pointer text-end text-base font-bar p-1  text-[#0E6795] font-semibold rounded-lg hover:text-cyan-500 ">
                         Comment
