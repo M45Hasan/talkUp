@@ -232,37 +232,81 @@ const Feed = () => {
   //################################### Like end #########
 
   //##################################### comment start ####
- let [comData, setComData]=useState({
-  comInput:""
+  let [comData, setComData] = useState({
+    comInput: "",
+  });
+  let writeCom = (e) => {
+    let { name, value } = e.target;
 
- })
- let writeCom=(e)=>{
-  let { name, value } = e.target;
+    setComData({
+      ...comData,
+      [name]: value,
+    });
+    console.log(comData);
+  };
 
-  setComData({
-    ...comData,[name]:value
-  })
-   console.log(comData)
- }
+  //#### Com send start ###
+  let comSend = (e) => {
+    console.log(e);
 
- //#### Com send start ###
- let comSend=(e)=>{
-console.log(e)
- 
-  set(push(ref(db,"userComment/"),{
-    postId:e.uid,
-    postmanId:e.pid,
-    postMan:e.userName,
-    commentar:reduxReturnData.userStoreData.userInfo.displayName,
-    commentarId:reduxReturnData.userStoreData.userInfo.uid,
-    commentarURL:reduxReturnData.userStoreData.userInfo.photoURL,
-    commentText: comData.comInput,
-  }));
+    set(
+      push(ref(db, "userComment/"), {
+        postId: e.uid,
+        postmanId: e.pid,
+        postMan: e.userName,
+        commentar: reduxReturnData.userStoreData.userInfo.displayName,
+        commentarId: reduxReturnData.userStoreData.userInfo.uid,
+        commentarURL: reduxReturnData.userStoreData.userInfo.photoURL,
+        commentText: comData.comInput,
+      }).then(()=>{
+        comData.comInput=""
+        
+      })
+    );
+  };
+  //#### Com send end ###
 
-  
- }
- //#### Com send end ###
+  //#### comArr fetch start ###
+
+  let [comArr, setComArr] = useState([]);
+  useEffect(() => {
+    const useRef = ref(db, "userComment/");
+    onValue(useRef, (snapshot) => {
+      let arr = [];
+      snapshot.forEach((item) => {
+        arr.push({ ...item.val(), kid: item.key });
+      });
+      setComArr(arr);
+    });
+  }, []);
+  console.log(comArr);
+  //#### Com fetch end ###
+
+  //#### Com delete start ###
+  let comDel = (item) => {
+    console.log(item);
+    if (item.postmanId === reduxReturnData.userStoreData.userInfo.uid) {
+      remove(ref(db, "userComment/" + item.kid));
+    }
+    console.log(item);
+    if (item.commentarId === reduxReturnData.userStoreData.userInfo.uid) {
+      remove(ref(db, "userComment/" + item.kid));
+    }
+  };
+  //#### Com delete end ###
   //##################################### comment end ####
+
+  //######################### scroll func ####
+  let scrollRef = useRef(null);
+
+  let scrollBottom = () => {
+    scrollRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    scrollBottom();
+  }, [comArr]);
+  //######################### scroll func ####
   return (
     <>
       <Container>
@@ -486,36 +530,112 @@ console.log(e)
                     </div>
                   </div>
                   {/* ######################################################################### Comment Start */}
+
                   {lnew === item.uid && (
-                    <div className="w-full h-10 border-[2px] border-[#0E6795] flex gap-x-[60px]   mt-[12px] relative">
-                      <input
-                        className="w-[470px] h-full pl-10 pr-14"
-                        type="text"
-                        name="comInput"
-                      
-                        onChange={writeCom}
-                        placeholder="Comment Here"
-                      />
-                      <div className="flex w-[120px] gap-x-5 ">
-                        <MdOutlineAddPhotoAlternate className=" cursor-pointer text-[#0E6795] self-end text-[30px]" />
-                        <AiFillCamera className=" cursor-pointer text-[#0E6795] self-end text-[30px]" />
-                        <HiMicrophone className=" cursor-pointer text-[#0E6795] self-end text-[30px]" />
-                      </div>
+                    <>
+                      <div className=" w-full h-[300px] overflow-y-scroll overscroll-y-none my-4">
+                        {comArr.map((e) => (
+                          <div className="w-full  shadow-lg  my-2 ">
+                            {reduxReturnData.userStoreData.userInfo.uid !==
+                              e.commentarId &&
+                              item.uid === e.postId && (
+                                <div className="w-[55%] bg-gray-300 rounded-lg shadow-lg p-2  relative hover:border-[1px]  hover:border-orange-700 ease-in duration-100">
+                                  <button
+                                    onClick={() => comDel(e)}
+                                    className="text-bar self-baseline absolute top-2 right-2 font-sm text-sm  text-[#0275B1] hover:text-red-500 cursor-pointer "
+                                  >
+                                    <ImCross />
+                                  </button>
+                                  <div className="flex justify-between items-center w-[150px] mb-[12px]">
+                                    <image className="shadow-lg ">
+                                      <Image
+                                        className="w-[42px] h-[42px] rounded-[4px] border-2 border-solid border-cyan-400"
+                                        imgSrc={e.commentarURL}
+                                      />
+                                    </image>
 
-                      <div className=" absolute left-[420px] top-[10px] flex gap-x-3 h-[25px] w-[50px]">
-                        <BsFillEmojiSunglassesFill className=" cursor-pointer text-[#0E6795] self-end text-[30px]" />
-                        <FiSend onClick={()=>comSend(item)} className="  cursor-pointer text-[#0E6795] text-[20px]" />
-                      </div>
+                                    <div className="w-[100px]">
+                                      <h4 className="font-bar font-bold mt-[-15px] text-[12px]">
+                                        {e.commentar}
+                                      </h4>
+                                    </div>
+                                  </div>
+                                  <div className="pr-1 w-[200px] overflow-x-hidden">
+                                    <p className="text-gray-700 text-sm font-semibold font-bar mb-4">
+                                      {e.commentText}
+                                    </p>
+                                  </div>
+                                </div>
+                              )}
 
-                      <div
-                        className=" absolute right-0 bottom-0"
-                        onClick={() => handleClose(item)}
-                      >
-                        <p className=" cursor-pointer text-end text-base font-bar   text-[#973333] font-semibold rounded-lg hover:text-red-500 ">
-                          <AiOutlineCloseSquare />
-                        </p>
+                            {reduxReturnData.userStoreData.userInfo.uid ===
+                              e.commentarId &&
+                              item.uid === e.postId && (
+                                <div className="w-[55%] bg-cyan-200 translate-x-[80%] hover:border-[1px] hover:border-orange-700 ease-in duration-100 rounded-lg shadow-lg p-2">
+                                  <button
+                                    onClick={() => comDel(e)}
+                                    className="text-bar self-baseline absolute top-2 right-2 font-sm text-sm  text-[#0275B1] hover:text-red-500 cursor-pointer "
+                                  >
+                                    <ImCross />
+                                  </button>
+                                  <div className="flex justify-between items-center w-[150px] mb-[12px]">
+                                    <image className="shadow-lg">
+                                      <Image
+                                        className="w-[42px] h-[42px] rounded-[4px] rounded-[4px] border-2 border-solid border-orange-400 "
+                                        imgSrc={e.commentarURL}
+                                      />
+                                    </image>
+
+                                    <div className="w-[100px]">
+                                      <h4 className="font-bar font-bold mt-[-15px] text-[12px]">
+                                        {e.commentar}
+                                      </h4>
+                                    </div>
+                                  </div>
+                                  <div className=" w-[200px] overflow-x-hidden">
+                                    <p className="text-gray-700 text-sm font-semibold font-bar  mb-4">
+                                      {e.commentText}
+                                    </p>
+                                  </div>
+                                </div>
+                              )}
+                          </div>
+                        ))}
+                        <div ref={scrollRef} />
                       </div>
-                    </div>
+                      <div className="w-full h-10 border-[1px] border-[#0E6795] flex gap-x-[60px] shadow-lg rounded-sm hover:border-orange-800 mt-[12px] relative">
+                        <input
+                          className="w-[470px] h-full pl-10 pr-14 outline-none"
+                          type="text"
+                          name="comInput"
+                          value={comData.comInput}
+                          onChange={writeCom}
+                          placeholder="Comment Here"
+                        />
+                        <div className="flex w-[120px] gap-x-5 ">
+                          <MdOutlineAddPhotoAlternate className=" cursor-pointer text-[#0E6795] self-end text-[30px]" />
+                          <AiFillCamera className=" cursor-pointer text-[#0E6795] self-end text-[30px]" />
+                          <HiMicrophone className=" cursor-pointer text-[#0E6795] self-end text-[30px]" />
+                        </div>
+
+                        <div className=" absolute left-[420px] top-[10px] flex gap-x-3 h-[25px] w-[50px]">
+                          <BsFillEmojiSunglassesFill className=" cursor-pointer text-[#0E6795] self-end text-[30px] hover:text-orange-600 hover:rotate-180 ease-in duration-100 " />
+                          <FiSend
+                            onClick={() => comSend(item)}
+                            className="  cursor-pointer text-[#0E6795] text-[20px] hover:text-[23px] origin-center rotate-180 ease-in duration-200 hover:rotate-0"
+                          />
+                        </div>
+
+                        <div
+                          className=" absolute right-0 bottom-0"
+                          onClick={() => handleClose(item)}
+                        >
+                          <p className=" cursor-pointer text-end text-base font-bar   text-[#973333] font-semibold rounded-lg hover:text-red-500 ">
+                            <AiOutlineCloseSquare />
+                          </p>
+                        </div>
+                      </div>
+                    </>
                   )}
                   {/* ######################################################################### Comment end */}
                 </div>
