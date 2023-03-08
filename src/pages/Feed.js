@@ -13,7 +13,7 @@ import {
 } from "react-icons/ai";
 import { BsFillEmojiSunglassesFill } from "react-icons/bs";
 import { HiMicrophone } from "react-icons/hi";
-import { MdPhotoCamera } from "react-icons/md";
+
 import {
   getDatabase,
   ref,
@@ -33,6 +33,7 @@ import {
 } from "firebase/storage";
 import SccroolButton from "../component/SccroolButton";
 import { v4 } from "uuid";
+import EmojiPicker from "emoji-picker-react";
 
 const Feed = () => {
   let navigate = useNavigate();
@@ -63,8 +64,6 @@ const Feed = () => {
         userPhoto: formData.userPhoto,
         userName: formData.userName,
         pid: reduxReturnData.userStoreData.userInfo.uid,
-      }).catch((error) => {
-        console.log(error.code);
       });
     } else {
       const imageRef = def(
@@ -129,10 +128,16 @@ const Feed = () => {
 
   let [lnew, setlNew] = useState("");
   let handleOpen = (item) => {
+    setSw(false);
     setlNew(item.uid);
+    setEmoji(false);
+    setInputEmojiShow(false);
   };
   let handleClose = (item) => {
+    setSw(false);
     setlNew("667");
+    setEmoji(false);
+    setInputEmojiShow(false);
   };
 
   //################################### Comment end #########
@@ -234,6 +239,7 @@ const Feed = () => {
   //##################################### comment start ####
   let [comData, setComData] = useState({
     comInput: "",
+    comURL: "",
   });
   let writeCom = (e) => {
     let { name, value } = e.target;
@@ -244,26 +250,6 @@ const Feed = () => {
     });
     console.log(comData);
   };
-
-  //#### Com send start ###
-  let comSend = (e) => {
-    console.log(e);
-
-    set(
-      push(ref(db, "userComment/"), {
-        postId: e.uid,
-        postmanId: e.pid,
-        postMan: e.userName,
-        commentar: reduxReturnData.userStoreData.userInfo.displayName,
-        commentarId: reduxReturnData.userStoreData.userInfo.uid,
-        commentarURL: reduxReturnData.userStoreData.userInfo.photoURL,
-        commentText: comData.comInput,
-      }).then(() => {
-        comData.comInput = "";
-      })
-    );
-  };
-  //#### Com send end ###
 
   //#### comArr fetch start ###
 
@@ -278,7 +264,7 @@ const Feed = () => {
       setComArr(arr);
     });
   }, []);
-  console.log(comArr);
+
   //#### Com fetch end ###
 
   //#### Com delete start ###
@@ -306,6 +292,84 @@ const Feed = () => {
     scrollBottom();
   }, [comArr]);
   //######################### scroll func ####
+
+  //########################### photo send start ####
+
+  const [comImgUp, setComImgUp] = useState(null);
+
+  let comSend = (e) => {
+    console.log("ami postPic");
+
+    if (comImgUp == null) {
+      set(
+        push(ref(db, "userComment/"), {
+          postId: e.uid,
+          postmanId: e.pid,
+          postMan: e.userName,
+          commentar: reduxReturnData.userStoreData.userInfo.displayName,
+          commentarId: reduxReturnData.userStoreData.userInfo.uid,
+          commentarURL: reduxReturnData.userStoreData.userInfo.photoURL,
+          commentText: comData.comInput,
+        })
+      ).catch((error) => {
+        console.log(error.code);
+      });
+    } else {
+      const imageRef = def(
+        storage,
+        `userComURL/${reduxReturnData.userStoreData.userInfo.uid} /${v4()}`
+      );
+
+      uploadBytes(imageRef, comImgUp).then((snapshot) => {
+        getDownloadURL(snapshot.ref).then((url) => {
+          console.log("url", url);
+          set(
+            push(ref(db, "userComment/"), {
+              postId: e.uid,
+              postmanId: e.pid,
+              postMan: e.userName,
+              commentar: reduxReturnData.userStoreData.userInfo.displayName,
+              commentarId: reduxReturnData.userStoreData.userInfo.uid,
+              commentarURL: reduxReturnData.userStoreData.userInfo.photoURL,
+              commentText: comData.comInput,
+              comURL: url,
+            })
+          );
+        });
+      });
+    }
+    setSw(false);
+  };
+
+  let [sw, setSw] = useState(false);
+
+  let comImgOpen = (e) => {
+    console.log(e);
+
+    setSw(!sw);
+  };
+
+  //########################### photo send end ####
+
+  //######################################### emoji ###
+  let [emojiShow, setEmoji] = useState(false);
+
+  let handleEmoji = (e) => {
+    setEmoji(!emojiShow);
+  };
+
+  let emojiPic = (item) => {
+    setComData({
+      comInput: comData.comInput
+        ? comData.comInput + item.emoji
+        : item.emoji + comData.comInput,
+    });
+  };
+  let [inputEmojiShow, setInputEmojiShow] = useState(false);
+  let inputClick = () => {
+    setInputEmojiShow(true);
+  };
+  //######################################### emoji end ###
   return (
     <>
       <Container>
@@ -442,6 +506,7 @@ const Feed = () => {
                       {" "}
                       {comArr.filter((e) => item.uid === e.postId).length}{" "}
                     </p>
+
                     <div onClick={() => handleOpen(item)}>
                       <p className=" cursor-pointer text-end text-base font-bar p-1  text-[#0E6795] font-semibold rounded-lg hover:text-cyan-500 ">
                         Comment
@@ -535,7 +600,7 @@ const Feed = () => {
 
                   {lnew === item.uid && (
                     <>
-                      <div className=" w-full h-[300px] overflow-y-scroll overscroll-y-none my-4">
+                      <div className=" w-full h-[200px] overflow-y-scroll overscroll-y-none my-4">
                         {comArr.map((e) => (
                           <div className="w-full  shadow-lg  my-2 ">
                             {reduxReturnData.userStoreData.userInfo.uid !==
@@ -567,6 +632,14 @@ const Feed = () => {
                                       {e.commentText}
                                     </p>
                                   </div>
+                                  {e.comURL && (
+                                    <image className="w-[300px] h-[150px] mt-1">
+                                      <Image
+                                        className="w-full h-[150px] cover border-2 border-orange-600 rounded-[5px]"
+                                        imgSrc={e.comURL}
+                                      />
+                                    </image>
+                                  )}
                                 </div>
                               )}
 
@@ -599,29 +672,62 @@ const Feed = () => {
                                       {e.commentText}
                                     </p>
                                   </div>
+                                  {e.comURL && (
+                                    <image className="w-[300px] h-[150px] mt-1">
+                                      <Image
+                                        className="w-full h-[150px] cover border-2 border-orange-600 shadow-lg rounded-[5px]"
+                                        imgSrc={e.comURL}
+                                      />
+                                    </image>
+                                  )}
                                 </div>
                               )}
                           </div>
                         ))}
                         <div ref={scrollRef} />
                       </div>
-                      <div className="w-full h-10 border-[1px] border-[#0E6795] flex gap-x-[60px] shadow-lg rounded-sm hover:border-orange-800 mt-[12px] relative">
+                      <div className="w-full h-10 border-[1px] border-[#0E6795] flex gap-x-[60px] bg-gray-300 shadow-lg rounded-sm hover:border-orange-800 mt-[12px] relative">
                         <input
-                          className="w-[470px] h-full pl-10 pr-14 outline-none"
+                          onClick={() => inputClick(item)}
+                          className="w-[470px] h-full pl-10 pr-[75px] outline-none bg-gray-300"
                           type="text"
                           name="comInput"
-                          value={comData.comInput}
+                          value={
+                            inputEmojiShow
+                              ? comData.comInput
+                              : (comData.comInput = "")
+                          }
                           onChange={writeCom}
                           placeholder="Comment Here"
                         />
+
+                        {sw && (
+                          <div className="w-[70px] overflow-x-hidden absolute right-[200px] top-2">
+                            <input
+                              className="text-[10px] "
+                              type="file"
+                              placeholder="Img"
+                              name="comURL"
+                              onChange={(event) => {
+                                setComImgUp(event.target.files[0]);
+                              }}
+                            />
+                          </div>
+                        )}
                         <div className="flex w-[120px] gap-x-5 ">
-                          <MdOutlineAddPhotoAlternate className=" cursor-pointer text-[#0E6795] self-end text-[30px]" />
+                          <MdOutlineAddPhotoAlternate
+                            onClick={() => comImgOpen(item)}
+                            className=" cursor-pointer text-[#0E6795] self-end text-[30px]"
+                          />
                           <AiFillCamera className=" cursor-pointer text-[#0E6795] self-end text-[30px]" />
                           <HiMicrophone className=" cursor-pointer text-[#0E6795] self-end text-[30px]" />
                         </div>
 
-                        <div className=" absolute left-[420px] top-[10px] flex gap-x-3 h-[25px] w-[50px]">
-                          <BsFillEmojiSunglassesFill className=" cursor-pointer text-[#0E6795] self-end text-[30px] hover:text-orange-600 hover:rotate-180 ease-in duration-100 " />
+                        <div className=" absolute left-[400px] top-[10px] flex gap-x-3 h-[25px] w-[50px]">
+                          <BsFillEmojiSunglassesFill
+                            onClick={() => handleEmoji(item)}
+                            className=" cursor-pointer text-[#0E6795] self-end text-[30px] hover:text-orange-600 hover:rotate-180 ease-in duration-100 "
+                          />
                           <FiSend
                             onClick={() => comSend(item)}
                             className="  cursor-pointer text-[#0E6795] text-[20px] hover:text-[23px] origin-center rotate-180 ease-in duration-200 hover:rotate-0"
@@ -637,6 +743,14 @@ const Feed = () => {
                           </p>
                         </div>
                       </div>
+                      {emojiShow && (
+                        <div className="">
+                          <EmojiPicker
+                            onEmojiClick={(item) => emojiPic(item)}
+                            className="h-[200px]"
+                          />
+                        </div>
+                      )}
                     </>
                   )}
                   {/* ######################################################################### Comment end */}
