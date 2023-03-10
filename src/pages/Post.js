@@ -216,7 +216,7 @@ const Post = () => {
             </div>
 
             {userPost.map((item) => (
-              <div className="mt-[25px] w-full px-6 py-[30px] bg-[#FFFF]">
+              <div className="mt-[25px] shadow-lg border-[1px] rounded-[4px] border-indigo-400 w-full px-6 py-[30px] bg-[#FFFF]">
                 <div className="flex justify-between items-center w-[150px] mb-[12px]">
                   <image className="">
                     <Image

@@ -34,6 +34,16 @@ import {
 import SccroolButton from "../component/SccroolButton";
 import { v4 } from "uuid";
 import EmojiPicker from "emoji-picker-react";
+import Webcam from "react-webcam";
+
+//############################### web Cam start ########
+const WebcamComponent = () => <Webcam />;
+const videoConstraints = {
+  width: 400,
+  height: 300,
+  facingMode: "user",
+};
+//############################### web Cam end ########
 
 const Feed = () => {
   let navigate = useNavigate();
@@ -74,15 +84,18 @@ const Feed = () => {
       uploadBytes(imageRef, imageUpload).then((snapshot) => {
         getDownloadURL(snapshot.ref).then((url) => {
           console.log("url", url);
+
           set(push(ref(db, "userPost")), {
             userText: formData.userText,
             userPhoto: formData.userPhoto,
             userName: formData.userName,
             pid: reduxReturnData.userStoreData.userInfo.uid,
             userpostPhoto: url,
-          }).catch((error) => {
-            console.log(error.code);
-          });
+          })
+            .catch((error) => {
+              console.log(error.code);
+            })
+            .then(() => {});
         });
       });
     }
@@ -132,12 +145,14 @@ const Feed = () => {
     setlNew(item.uid);
     setEmoji(false);
     setInputEmojiShow(false);
+    setPicture("");
   };
   let handleClose = (item) => {
     setSw(false);
     setlNew("667");
     setEmoji(false);
     setInputEmojiShow(false);
+    setPicture("");
   };
 
   //################################### Comment end #########
@@ -240,6 +255,8 @@ const Feed = () => {
   let [comData, setComData] = useState({
     comInput: "",
     comURL: "",
+    comCamURL: "",
+    comVoice: null,
   });
   let writeCom = (e) => {
     let { name, value } = e.target;
@@ -296,9 +313,12 @@ const Feed = () => {
   //########################### photo send start ####
 
   const [comImgUp, setComImgUp] = useState(null);
+  let [vSend, setVsend] = useState(null);
 
   let comSend = (e) => {
     console.log("ami postPic");
+    console.log("KamPic", picture);
+    console.log(recordedAudio);
 
     if (comImgUp == null) {
       set(
@@ -310,10 +330,12 @@ const Feed = () => {
           commentarId: reduxReturnData.userStoreData.userInfo.uid,
           commentarURL: reduxReturnData.userStoreData.userInfo.photoURL,
           commentText: comData.comInput,
+          comCamURL: picture,
+          comVoice: vSend,
         })
-      ).catch((error) => {
-        console.log(error.code);
-      });
+      );
+      setPicture("");
+      setCaptShow(true);
     } else {
       const imageRef = def(
         storage,
@@ -333,12 +355,26 @@ const Feed = () => {
               commentarURL: reduxReturnData.userStoreData.userInfo.photoURL,
               commentText: comData.comInput,
               comURL: url,
+              comCamURL: picture,
+              comVoice: vSend,
             })
           );
+          setPicture("");
+          setCaptShow(true);
         });
       });
     }
+
     setSw(false);
+    setComImgUp(null);
+    setComData({
+      comInput: "",
+      comURL: "",
+      comCamURL: "",
+      comVoice: null,
+    });
+
+    setInputEmojiShow();
   };
 
   let [sw, setSw] = useState(false);
@@ -370,6 +406,68 @@ const Feed = () => {
     setInputEmojiShow(true);
   };
   //######################################### emoji end ###
+
+  //############################### web Cam start ########
+  const [picture, setPicture] = useState("");
+  const webcamRef = useRef(null);
+  const capture = () => {
+    const pictureSrc = webcamRef.current.getScreenshot();
+    setPicture(pictureSrc);
+  };
+  let [kapShow, setKamShow] = useState("");
+  let cameraOpen = (item) => {
+    console.log(item);
+    setKamShow(item.uid);
+  };
+  let [captShow, setCaptShow] = useState(true);
+  //############################### web Cam end ########
+
+  //############################### voice start ########
+  const [recordedAudio, setRecordedAudio] = useState(null);
+  let mediaRecorder;
+
+  let [micShow, setMic] = useState("");
+  let micOpen = (item) => {
+    setMic(item.uid);
+  };
+
+  function startRecording() {
+    navigator.mediaDevices
+      .getUserMedia({ audio: true })
+      .then((stream) => {
+        mediaRecorder = new MediaRecorder(stream);
+        mediaRecorder.start();
+
+        const chunks = [];
+        mediaRecorder.addEventListener("dataavailable", (event) => {
+          chunks.push(event.data);
+        });
+
+        mediaRecorder.addEventListener("stop", () => {
+          const blob = new Blob(chunks, { type: "audio/ogg; codecs=opus" });
+          setRecordedAudio(blob);
+        });
+      })
+      .catch((error) => console.error(error));
+  }
+
+  function stopRecording() {
+    mediaRecorder.stop();
+  }
+
+  let sendMessage = (item) => {
+    const voiceRef = def(
+      storage,
+      `userVoice/${reduxReturnData.userStoreData.userInfo.uid} /${v4()}`
+    );
+
+    uploadBytes(voiceRef, picture).then((snapshot) => {
+      getDownloadURL(snapshot.ref).then((url) => {
+        setVsend(url);
+      });
+    });
+  };
+  //############################### voice end ########
   return (
     <>
       <Container>
@@ -455,7 +553,7 @@ const Feed = () => {
               ?.slice(0)
               .reverse()
               .map((item) => (
-                <div className="mt-[25px] w-full px-6 py-[30px] bg-[#FFFF]">
+                <div className="mt-[25px] w-full px-6 shadow-lg border-[1px] rounded-[4px] border-indigo-400 py-[30px] bg-[#FFFF]">
                   <div className="flex justify-between items-center w-[150px] mb-[12px]">
                     {item.userPhoto && (
                       <image className="">
@@ -640,6 +738,23 @@ const Feed = () => {
                                       />
                                     </image>
                                   )}
+
+                                  {e.comCamURL && (
+                                    <image className="w-[300px] h-[150px] mt-1">
+                                      <Image
+                                        className="w-full h-[150px] cover border-2 border-orange-600 shadow-lg rounded-[5px]"
+                                        imgSrc={e.comCamURL}
+                                      />
+                                    </image>
+                                  )}
+                                  {e.comVoice && (
+                                    <audio
+                                      className="h-[28px]"
+                                      src={e.comVoice}
+                                      type="audio/ogg; codecs=opus"
+                                      controls
+                                    />
+                                  )}
                                 </div>
                               )}
 
@@ -656,7 +771,7 @@ const Feed = () => {
                                   <div className="flex justify-between items-center w-[150px] mb-[12px]">
                                     <image className="shadow-lg">
                                       <Image
-                                        className="w-[42px] h-[42px] rounded-[4px] rounded-[4px] border-2 border-solid border-orange-400 "
+                                        className="w-[42px] h-[42px] rounded-[4px] border-2 border-solid border-orange-400 "
                                         imgSrc={e.commentarURL}
                                       />
                                     </image>
@@ -679,6 +794,22 @@ const Feed = () => {
                                         imgSrc={e.comURL}
                                       />
                                     </image>
+                                  )}
+                                  {e.comCamURL && (
+                                    <image className="w-[300px] h-[150px] mt-1">
+                                      <Image
+                                        className="w-full h-[150px] cover border-2 border-orange-600 shadow-lg rounded-[5px]"
+                                        imgSrc={e.comCamURL}
+                                      />
+                                    </image>
+                                  )}
+                                  {e.comVoice && (
+                                    <audio
+                                      className="h-[28px]"
+                                      src={e.comVoice}
+                                      type="audio/ogg; codecs=opus"
+                                      controls
+                                    />
                                   )}
                                 </div>
                               )}
@@ -714,13 +845,108 @@ const Feed = () => {
                             />
                           </div>
                         )}
+                        {kapShow === item.uid && (
+                          <div className="absolute top-[-260px] shadow-xl right-[0px] bg-slate-600 rounded-[4px]">
+                            <div>
+                              {picture == "" ? (
+                                <Webcam
+                                  className="border-b-[2px] border-cyan-700"
+                                  audio={true}
+                                  height={200}
+                                  ref={webcamRef}
+                                  width={300}
+                                  screenshotFormat="image/jpeg"
+                                  videoConstraints={videoConstraints}
+                                />
+                              ) : (
+                                <div className=" mb-2 ">
+                                  <img
+                                    className="w-[220px] h-[220px] shadow-xl  "
+                                    src={picture}
+                                    alt="kapPic"
+                                  />
+                                </div>
+                              )}
+                            </div>
+                            <div className="flex justify-between">
+                              {captShow && (
+                                <button
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    capture();
+                                    setCaptShow(false);
+                                  }}
+                                  className="cursor-pointer text-end text-base font-bar p-1  text-[#0E6795] font-semibold rounded-lg hover:text-cyan-500 "
+                                >
+                                  Capture
+                                </button>
+                              )}
+
+                              <button
+                                onClick={(e) => {
+                                  setKamShow("kk");
+
+                                  setPicture("");
+                                  setCaptShow(true);
+                                }}
+                                className="cursor-pointer text-end text-base font-bar p-1  text-[#0E6795] font-semibold rounded-lg hover:text-cyan-500 "
+                              >
+                                Close
+                              </button>
+                            </div>
+                          </div>
+                        )}
+                        {micShow === item.uid && (
+                          <div className="bg-gray-500 flex gap-x-16 h-[28px] mt-[1px] right-[0px] top-10 rounded-md absolute w-full">
+                            {recordedAudio ? (
+                              <audio
+                                className="h-[28px]"
+                                src={URL.createObjectURL(recordedAudio)}
+                                controls
+                              />
+                            ) : (
+                              <p>No audio yet</p>
+                            )}
+                            <button
+                              className="bg-orange-700 rounded-md p-[2px]  cursor-pointer font-bar text-[#000] text-sm font-semibold "
+                              onClick={startRecording}
+                            >
+                              Start
+                            </button>
+                            <button
+                              className=" bg-orange-700 rounded-md p-[2px] cursor-pointer text-[#000] text-sm font-bar font-semibold "
+                              onClick={stopRecording}
+                            >
+                              Stop
+                            </button>
+                            <button onClick={() => sendMessage(item)}>
+                              <FiSend className="  cursor-pointer text-[#0E6795] text-[20px] hover:text-[23px] origin-center rotate-180 ease-in duration-200 hover:rotate-0" />
+                            </button>
+                            <button
+                              className="bg-red-700 block translate-x-[38px] rounded-md p-[2px]  cursor-pointer font-bar text-[#000] text-sm font-semibold "
+                              onClick={(item) => {
+                                setMic("998");
+                                setRecordedAudio(null);
+                              }}
+                            >
+                              Return
+                            </button>
+                          </div>
+                        )}
+
                         <div className="flex w-[120px] gap-x-5 ">
                           <MdOutlineAddPhotoAlternate
-                            onClick={() => comImgOpen(item)}
+                            onClick={(e) => comImgOpen(item)}
                             className=" cursor-pointer text-[#0E6795] self-end text-[30px]"
                           />
-                          <AiFillCamera className=" cursor-pointer text-[#0E6795] self-end text-[30px]" />
-                          <HiMicrophone className=" cursor-pointer text-[#0E6795] self-end text-[30px]" />
+                          <AiFillCamera
+                            onClick={() => cameraOpen(item)}
+                            className=" cursor-pointer text-[#0E6795] self-end text-[30px]"
+                          />
+                          <HiMicrophone
+                            onClick={(e) => micOpen(item)}
+                            className=" cursor-pointer text-[#0E6795] self-end text-[30px]"
+                          />
                         </div>
 
                         <div className=" absolute left-[400px] top-[10px] flex gap-x-3 h-[25px] w-[50px]">
@@ -729,7 +955,7 @@ const Feed = () => {
                             className=" cursor-pointer text-[#0E6795] self-end text-[30px] hover:text-orange-600 hover:rotate-180 ease-in duration-100 "
                           />
                           <FiSend
-                            onClick={() => comSend(item)}
+                            onClick={(e) => comSend(item)}
                             className="  cursor-pointer text-[#0E6795] text-[20px] hover:text-[23px] origin-center rotate-180 ease-in duration-200 hover:rotate-0"
                           />
                         </div>
