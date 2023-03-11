@@ -146,6 +146,9 @@ const Feed = () => {
     setEmoji(false);
     setInputEmojiShow(false);
     setPicture("");
+    setMic("998");
+    setRecordedAudio(null);
+    setVsend(null);
   };
   let handleClose = (item) => {
     setSw(false);
@@ -153,6 +156,9 @@ const Feed = () => {
     setEmoji(false);
     setInputEmojiShow(false);
     setPicture("");
+    setMic("998");
+    setRecordedAudio(null);
+    setVsend(null);
   };
 
   //################################### Comment end #########
@@ -373,6 +379,9 @@ const Feed = () => {
       comCamURL: "",
       comVoice: null,
     });
+    setRecordedAudio("");
+
+    setVsend("");
 
     setInputEmojiShow();
   };
@@ -455,17 +464,19 @@ const Feed = () => {
     mediaRecorder.stop();
   }
 
-  let sendMessage = (item) => {
+  let saveMessage = (item) => {
     const voiceRef = def(
       storage,
       `userVoice/${reduxReturnData.userStoreData.userInfo.uid} /${v4()}`
     );
 
-    uploadBytes(voiceRef, picture).then((snapshot) => {
+    uploadBytes(voiceRef, recordedAudio).then((snapshot) => {
       getDownloadURL(snapshot.ref).then((url) => {
         setVsend(url);
+        setRecordedAudio("");
       });
     });
+    setMic("998");
   };
   //############################### voice end ########
   return (
@@ -897,7 +908,7 @@ const Feed = () => {
                           </div>
                         )}
                         {micShow === item.uid && (
-                          <div className="bg-gray-500 flex gap-x-16 h-[28px] mt-[1px] right-[0px] top-10 rounded-md absolute w-full">
+                          <div className="bg-gradient-to-r from-sky-400 via-cyan-900 to-indigo-500 flex gap-x-16 h-[28px] mt-[1px] right-[0px] top-10 border-[1px] border-pink-500  rounded-md absolute w-full">
                             {recordedAudio ? (
                               <audio
                                 className="h-[28px]"
@@ -908,22 +919,22 @@ const Feed = () => {
                               <p>No audio yet</p>
                             )}
                             <button
-                              className="bg-orange-700 rounded-md p-[2px]  cursor-pointer font-bar text-[#000] text-sm font-semibold "
+                              className="bg-gradient-to-r from-green-400 to-blue-500 hover:from-pink-500 hover:to-yellow-500 rounded-md p-[2px] cursor-pointer font-bar text-[#000] text-sm font-semibold "
                               onClick={startRecording}
                             >
                               Start
                             </button>
                             <button
-                              className=" bg-orange-700 rounded-md p-[2px] cursor-pointer text-[#000] text-sm font-bar font-semibold "
+                              className="bg-gradient-to-r from-green-400 to-blue-500 hover:from-pink-500 hover:to-yellow-500  rounded-md p-[2px] cursor-pointer  text-[#000] text-sm font-bar font-semibold "
                               onClick={stopRecording}
                             >
                               Stop
                             </button>
-                            <button onClick={() => sendMessage(item)}>
-                              <FiSend className="  cursor-pointer text-[#0E6795] text-[20px] hover:text-[23px] origin-center rotate-180 ease-in duration-200 hover:rotate-0" />
+                            <button onClick={() => saveMessage(item)}>
+                              <FiSend className="  cursor-pointer text-amber-300 text-[20px] hover:text-[23px] origin-center rotate-180 ease-in duration-200 hover:rotate-0" />
                             </button>
                             <button
-                              className="bg-red-700 block translate-x-[38px] rounded-md p-[2px]  cursor-pointer font-bar text-[#000] text-sm font-semibold "
+                              className="hover:bg-red-700 block translate-x-[38px] bg-amber-300 rounded-md p-[2px]  cursor-pointer font-bar text-[#000] text-sm font-semibold "
                               onClick={(item) => {
                                 setMic("998");
                                 setRecordedAudio(null);
