@@ -325,6 +325,7 @@ const Feed = () => {
     console.log("ami postPic");
     console.log("KamPic", picture);
     console.log(recordedAudio);
+    setVsend("");
 
     if (comImgUp == null) {
       set(
@@ -479,6 +480,7 @@ const Feed = () => {
     setMic("998");
   };
   //############################### voice end ########
+
   return (
     <>
       <Container>
@@ -916,21 +918,29 @@ const Feed = () => {
                                 controls
                               />
                             ) : (
-                              <p>No audio yet</p>
+                              <p className="text-base font-bar">No audio yet</p>
                             )}
                             <button
                               className="bg-gradient-to-r from-green-400 to-blue-500 hover:from-pink-500 hover:to-yellow-500 rounded-md p-[2px] cursor-pointer font-bar text-[#000] text-sm font-semibold "
-                              onClick={startRecording}
+                              onClick={() => {
+                                startRecording(item);
+                              }}
                             >
                               Start
                             </button>
                             <button
                               className="bg-gradient-to-r from-green-400 to-blue-500 hover:from-pink-500 hover:to-yellow-500  rounded-md p-[2px] cursor-pointer  text-[#000] text-sm font-bar font-semibold "
-                              onClick={stopRecording}
+                              onClick={() => {
+                                stopRecording(item);
+                              }}
                             >
                               Stop
                             </button>
-                            <button onClick={() => saveMessage(item)}>
+                            <button
+                              onClick={() => {
+                                saveMessage(item);
+                              }}
+                            >
                               <FiSend className="  cursor-pointer text-amber-300 text-[20px] hover:text-[23px] origin-center rotate-180 ease-in duration-200 hover:rotate-0" />
                             </button>
                             <button

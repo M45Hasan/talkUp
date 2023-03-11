@@ -10,6 +10,7 @@
     "emoji-picker-react": "^4.4.7",
     "firebase": "^9.17.1",
     "react": "^18.2.0",
+    "react-accessible-accordion": "^5.0.0",
     "react-cropper": "^2.1.8",
     "react-dom": "^18.2.0",
     "react-icons": "^4.7.1",
