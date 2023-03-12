@@ -43,14 +43,12 @@ const Head = () => {
   let [userPost, setPost] = useState([]);
 
   useEffect(() => {
-    const userRef = ref(
-      db,
-      "userPost"
-    );
+    const userRef = ref(db, "userPost");
     onValue(userRef, (snapshot) => {
       let arr = [];
-      snapshot.forEach((item) => {    //problem here want to show other post
-        console.log(item);
+      snapshot.forEach((item) => {
+        //problem here want to show other post
+        console.log(item.val());
         if (item.val().pid !== reduxReturnData.userStoreData.userInfo.uid) {
           arr.push({ ...item.val() });
 
@@ -59,8 +57,23 @@ const Head = () => {
       });
       setPost(arr);
     });
-    console.log("ami Post arr", userPost);
   }, []);
+  console.log("ami Post arr", userPost);
+  //######################## users database cll
+  let [userShow, setUser] = useState([]);
+
+  useEffect(() => {
+    const useRef = ref(db, "users/");
+    onValue(useRef, (snapshot) => {
+      let arr = [];
+      snapshot.forEach((item) => {
+        arr.push({ ...item.val(), uid: item.key });
+      });
+      setUser(arr);
+    });
+  }, []);
+  console.log(userShow);
+  //######################## users database cll
 
   return (
     <>
@@ -69,20 +82,34 @@ const Head = () => {
           <image>
             <Image imgSrc="../assets/lo.png" />
           </image>
-          <div className="w-[28%]  flex justify-between items-center">
-            <div className="flex  w-[80px] justify-between ">
+          <div className="w-[32%]  flex justify-between items-center">
+            <div className="flex  w-[130px] justify-between shadow-xl rounded-[4px] border-[1px] border-white-200">
+              <div className="w-[80px] border-[1px] border-orange-600 rounded-full">
+              
               <image>
                 <Image
                   className="w-[42px] h-[42px] rounded-full"
                   imgSrc={reduxReturnData.userStoreData.userInfo.photoURL}
                 />
               </image>
-              <h4 className="font-bar font-bold text-[12px]">
-                {reduxReturnData.userStoreData.userInfo.displayName}
-              </h4>
+              </div>
+              <div className="w-[150px]">
+                <h4 className="font-bar font-bold text-[12px]">
+                  {reduxReturnData.userStoreData.userInfo.displayName}
+                </h4>
+                <p className="font-bar font-bold block text-[12px]">
+                  @
+                  {userShow.map(
+                    (item) =>
+                      reduxReturnData.userStoreData.userInfo.uid === item.uid &&
+                      item.about
+                  )}
+                </p>
+              </div>
             </div>
-
-            <LogoutButton />
+            <div className="shadow-xl rounded-full">
+              <LogoutButton />
+            </div>
           </div>
         </nav>
 

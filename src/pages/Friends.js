@@ -3,7 +3,14 @@ import Image from "../component/Image";
 
 import Container from "../component/Container";
 import { useNavigate } from "react-router-dom";
-import { getDatabase, ref, onValue, set, push } from "firebase/database";
+import {
+  getDatabase,
+  ref,
+  onValue,
+  set,
+  push,
+  remove,
+} from "firebase/database";
 import { useSelector } from "react-redux";
 import {
   Accordion,
@@ -34,6 +41,7 @@ const Friends = () => {
     onValue(userref, (snapshot) => {
       let arr = [];
       snapshot.forEach((item) => {
+        console.log(item.key);
         if (item.key !== reduxReturnData.userStoreData.userInfo.uid) {
           arr.push({ ...item.val(), uid: item.key });
         }
@@ -41,6 +49,7 @@ const Friends = () => {
       setUserList(arr);
     });
   }, []);
+  console.log(userList);
 
   //################ friend Request start #########
   let handleUserList = (item) => {
@@ -74,17 +83,114 @@ const Friends = () => {
     onValue(useRef, (snapshot) => {
       let arr = [];
       snapshot.forEach((item) => {
-        if (
-          item.val().receiverId === reduxReturnData.userStoreData.userInfo.uid
-        ) {
-          arr.push({ ...item.val(), uid: item.key });
-        }
+        arr.push(item.val().receiverId + item.val().requSenderId);
       });
       setReq(arr);
     });
   }, []);
   console.log(reqShow);
+  //##################################### request arr
+  let [rqShow, setRq] = useState([]);
+  useEffect(() => {
+    const useRef = ref(db, "fndRequest/");
+    onValue(useRef, (snapshot) => {
+      let arr = [];
+      snapshot.forEach((item) => {
+        arr.push({ ...item.val(), uid: item.key });
+      });
+      setRq(arr);
+    });
+  }, []);
+  console.log(rqShow);
+
   //################ friend Request end #########
+
+  //################ friend Request delete/cancel start #########
+
+  let deleteReq = (item) => {
+    if (item.receiverId === reduxReturnData.userStoreData.userInfo.uid) {
+      remove(ref(db, "fndRequest/" + item.uid));
+    }
+    console.log(item);
+  };
+
+  let reqCancel = (item) => {
+    console.log(item);
+    rqShow.forEach((itm) => {
+      if (
+        item.uid === itm.receiverId &&
+        reduxReturnData.userStoreData.userInfo.uid === itm.requSenderId
+      ) {
+        remove(ref(db, "fndRequest/" + itm.uid));
+      }
+    });
+  };
+  //################ friend Request delete end #########
+
+  //################ friend Request Accept Start #########
+
+  let acceptRequ = (item) => {
+    console.log(item.uid);
+    set(push(ref(db, "friends/")), {
+      friendId: item.requSenderId,
+      friendName: item.requSenderName,
+      friendURL: item.requSenderURL,
+      friendAbout: item.requSenderAbout,
+      friendLoc: item.requSenderLoc,
+      friendEmail: item.requSenderEmail,
+      fndAcptId: item.receiverId,
+      fndAcptName: item.receiverName,
+      fndAcptURL: reduxReturnData.userStoreData.userInfo.photoURL,
+      fndAcptEmail: item.receiverEmail,
+      fndAcptABout: item.receiverAbout,
+      frnAcptLoc: item.receiverLoc,
+      reqId: item.uid,
+    }).then(() => {
+      remove(ref(db, "fndRequest/" + item.uid));
+    });
+  };
+
+  let [frnShow, setFrn] = useState([]);
+  useEffect(() => {
+    const useRef = ref(db, "friends/");
+    onValue(useRef, (snapshot) => {
+      let arr = [];
+      snapshot.forEach((item) => {
+        arr.push({ ...item.val(), fndUid: item.key });
+      });
+      setFrn(arr);
+    });
+  }, []);
+  console.log(frnShow);
+
+  //############################# for button friend arr####
+
+  let [fnShow, setFn] = useState([]);
+  useEffect(() => {
+    const useRef = ref(db, "friends/");
+    onValue(useRef, (snapshot) => {
+      let arr = [];
+
+      snapshot.forEach((item) => {
+        arr.push(item.val().friendId + item.val().fndAcptId);
+      });
+      setFn(arr);
+    });
+  }, []);
+  console.log(fnShow);
+  //################ friend Request Accept end #########
+
+  //################ unfriend fun start #########
+  let unfriendFun = (item) => {
+    console.log(item);
+    if (
+      item.fndAcptId === reduxReturnData.userStoreData.userInfo.uid ||
+      item.friendId === reduxReturnData.userStoreData.userInfo.uid
+    ) {
+      remove(ref(db, "friends/" + item.fndUid));
+    }
+  };
+  //################ unfriend fun end #########
 
   return (
     <>
@@ -134,110 +240,419 @@ const Friends = () => {
         <div className="w-[100%] flex justify-start mt- items-center">
           <div>
             <div className=" flex justify-between w-max pt-4  ">
-              <div className=" w-[720px] h-[360px] ">
-                <Accordion>
-                  <AccordionItem>
-                    <AccordionItemHeading>
-                      <AccordionItemButton>User list</AccordionItemButton>
-                    </AccordionItemHeading>
-                    <AccordionItemPanel className="h-[250px]  overflow-y-scroll">
-                      {userList.map((item) => (
-                        <div
-                          key={item.uid}
-                          className="mb-3 border-b pb-1 w-[130px] border-black  "
-                        >
-                          <div className="flex w-[110x] justify-between ">
-                            {item.photoURL ? (
-                              <image>
-                                <Image
-                                  className="w-[42px] h-[42px] rounded-full"
-                                  imgSrc={item.photoURL}
-                                />
-                              </image>
-                            ) : (
-                              <image>
-                                <Image
-                                  className="w-[42px] h-[42px] rounded-full"
-                                  imgSrc="assets/wx1.png"
-                                />
-                              </image>
-                            )}
-                            <div className="ml-1">
-                              <h4 className="font-bar font-bold text-[12px]">
-                                {item.displayName}
-                              </h4>
-                              <p className="font-bar font-semibold text-[10px] text-[#181818]">
-                                @ {item.about}
-                              </p>
-                            </div>
+              <div className=" w-[720px] h-[360px] flex justify-between ">
+                <div className="w-[355px]">
+                  {" "}
+                  <Accordion>
+                    <AccordionItem>
+                      <AccordionItemHeading>
+                        <AccordionItemButton>
+                          User list{" "}
+                          <span className="pl-2 text-[#0E6795] font-bar font-semibold">
+                            {userList.length}
+                          </span>
+                        </AccordionItemButton>
+                      </AccordionItemHeading>
+                      <AccordionItemPanel className="h-[250px]  overflow-y-scroll">
+                        {userList.map((item) => (
+                          <div
+                            key={item.uid}
+                            className="mb-3 border-b pb-1 w-[130px] border-black shadow-xl "
+                          >
+                            <div className="flex w-[202px] justify-between ">
+                              {item.photoURL ? (
+                                <div className="w-[40px] border-[1px] border-orange-600 rounded-full">
+                                  <image>
+                                    <Image
+                                      className="w-[40px] h-[40px] rounded-full"
+                                      imgSrc={item.photoURL}
+                                    />
+                                  </image>
+                                </div>
+                              ) : (
+                                <image>
+                                  <Image
+                                    className="w-[40px] h-[40px] rounded-full"
+                                    imgSrc="assets/wx1.png"
+                                  />
+                                </image>
+                              )}
+                              <div className="ml-1 w-[120px]">
+                                <h4 className="font-bar font-bold text-[12px]">
+                                  {item.displayName}
+                                </h4>
+                                <p className="font-bar font-semibold text-[10px] text-[#181818]">
+                                  @{item.about}
+                                </p>
+                              </div>
 
-                            <div className="w-[40px]">
+                              <div className="w-[40px]">
+                                {reqShow.includes(
+                                  item.uid +
+                                    reduxReturnData.userStoreData.userInfo.uid
+                                ) ||
+                                reqShow.includes(
+                                  reduxReturnData.userStoreData.userInfo.uid +
+                                    item.uid
+                                ) ? (
+                                  <div>
+                                    <button className="cursor-pointer px-[2px] bg-[#0E6795] text-white font-bar text-[12px] font-semibold rounded-[4px]">
+                                      Pendding
+                                    </button>
+
+                                    {reqShow.includes(
+                                      item.uid +
+                                        reduxReturnData.userStoreData.userInfo
+                                          .uid
+                                    ) && (
+                                      <button
+                                        onClick={() => reqCancel(item)}
+                                        className="cursor-pointer px-[2px] bg-[#0E6795] text-white font-bar text-[12px] font-semibold rounded-[4px]"
+                                      >
+                                        cancel
+                                      </button>
+                                    )}
+                                  </div>
+                                ) : fnShow.includes(
+                                    item.uid +
+                                      reduxReturnData.userStoreData.userInfo.uid
+                                  ) ||
+                                  fnShow.includes(
+                                    reduxReturnData.userStoreData.userInfo.uid +
+                                      item.uid
+                                  ) ? (
+                                  <button className="cursor-pointer px-[2px] bg-[#0E6795] text-white font-bar text-[12px] font-semibold rounded-[4px]">
+                                    Friend
+                                  </button>
+                                ) : (
+                                  <button
+                                    onClick={() => handleUserList(item)}
+                                    className="cursor-pointer px-[2px] bg-[#0E6795] text-white font-bar text-[12px] font-semibold rounded-[4px]"
+                                  >
+                                    Request
+                                  </button>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </AccordionItemPanel>
+                    </AccordionItem>
+
+                    <AccordionItem>
+                      <AccordionItemHeading>
+                        <AccordionItemButton>
+                          Friends Request{" "}
+                          <span className="pl-2 text-[#0E6795] font-bar font-semibold">
+                            {" "}
+                            {
+                              rqShow.filter(
+                                (item) =>
+                                  item.receiverId ===
+                                  reduxReturnData.userStoreData.userInfo.uid
+                              ).length
+                            }
+                          </span>
+                        </AccordionItemButton>
+                      </AccordionItemHeading>
+                      <AccordionItemPanel className="h-[250px]  overflow-y-scroll">
+                        {rqShow.map(
+                          (item) =>
+                            item.receiverId ===
+                              reduxReturnData.userStoreData.userInfo.uid && (
+                              <div
+                                key={item.requSenderId}
+                                className="mb-3 border-b pb-1 w-[120px] border-black relative "
+                              >
+                                <div className="flex w-[100x] gap-x-2 ">
+                                  {item.requSenderURL ? (
+                                    <image>
+                                      <Image
+                                        className="w-[42px] h-[42px] rounded-full"
+                                        imgSrc={item.requSenderURL}
+                                      />
+                                    </image>
+                                  ) : (
+                                    <image>
+                                      <Image
+                                        className="w-[42px] h-[42px] rounded-full"
+                                        imgSrc="assets/wx1.png"
+                                      />
+                                    </image>
+                                  )}
+                                  <div className="ml-1">
+                                    <h4 className="font-bar font-bold text-[12px]">
+                                      {item.requSenderName}
+                                    </h4>
+                                    <p className="font-bar font-semibold text-[10px] text-[#181818]">
+                                      @ {item.requSenderAbout}
+                                    </p>
+                                  </div>
+                                </div>
+                                <div className="w-[90px] justify-between top-[5px] right-[-95px] absolute flex">
+                                  <button
+                                    onClick={() => acceptRequ(item)}
+                                    className="cursor-pointer px-[2px] bg-[#0E6795] text-white font-bar text-[12px] font-semibold rounded-[4px]"
+                                  >
+                                    Accept
+                                  </button>
+                                  <button
+                                    onClick={() => deleteReq(item)}
+                                    className="cursor-pointer px-[2px] bg-[#0E6795] text-white font-bar text-[12px] font-semibold rounded-[4px]"
+                                  >
+                                    Delete
+                                  </button>
+                                </div>
+                              </div>
+                            )
+                        )}
+                      </AccordionItemPanel>
+                    </AccordionItem>
+
+                    <AccordionItem>
+                      <AccordionItemHeading>
+                        <AccordionItemButton>
+                          Friends{" "}
+                          <span className="pl-2 text-[#0E6795] font-bar font-semibold">
+                            {" "}
+                            {
+                              frnShow.filter((item) =>
+                                item.fndAcptId ===
+                                reduxReturnData.userStoreData.userInfo.uid
+                                  ? item.fndAcptId ===
+                                    reduxReturnData.userStoreData.userInfo.uid
+                                  : item.friendId ===
+                                    reduxReturnData.userStoreData.userInfo.uid
+                              ).length
+                            }
+                          </span>
+                        </AccordionItemButton>
+                      </AccordionItemHeading>
+                      <AccordionItemPanel className="h-[250px]  overflow-y-scroll">
+                        {frnShow.map(
+                          (item) =>
+                            item.fndAcptId ===
+                              reduxReturnData.userStoreData.userInfo.uid && (
+                              <div
+                                key={item.friendId}
+                                className="mb-3 border-b pb-1 w-[120px] border-black relative "
+                              >
+                                <div className="flex w-[100x] gap-x-2 ">
+                                  {item.friendURL ? (
+                                    <image>
+                                      <Image
+                                        className="w-[42px] h-[42px] rounded-full"
+                                        imgSrc={item.friendURL}
+                                      />
+                                    </image>
+                                  ) : (
+                                    <image>
+                                      <Image
+                                        className="w-[42px] h-[42px] rounded-full"
+                                        imgSrc="assets/wx1.png"
+                                      />
+                                    </image>
+                                  )}
+                                  <div className="ml-1">
+                                    <h4 className="font-bar font-bold text-[12px]">
+                                      {item.friendName}
+                                    </h4>
+                                    <p className="font-bar font-semibold text-[10px] text-[#181818]">
+                                      @ {item.friendAbout}
+                                    </p>
+                                  </div>
+                                </div>
+                                <div className="w-[90px] justify-between top-[5px] right-[-95px] absolute flex">
+                                  <button
+                                    onClick={"() => acceptRequ(item)"}
+                                    className="cursor-pointer px-[2px] bg-[#0E6795] text-white font-bar text-[12px] font-semibold rounded-[4px]"
+                                  >
+                                    Block
+                                  </button>
+                                  <button
+                                    onClick={() => unfriendFun(item)}
+                                    className="cursor-pointer px-[2px] bg-[#0E6795] text-white font-bar text-[12px] font-semibold rounded-[4px]"
+                                  >
+                                    Unfriend
+                                  </button>
+                                </div>
+                              </div>
+                            )
+                        )}
+
+                        {frnShow.map(
+                          (item) =>
+                            item.friendId ===
+                              reduxReturnData.userStoreData.userInfo.uid && (
+                              <div
+                                key={item.friendId}
+                                className="mb-3 border-b pb-1 w-[120px] border-black relative "
+                              >
+                                <div className="flex w-[100x] gap-x-2 ">
+                                  {item.fndAcptURL ? (
+                                    <image>
+                                      <Image
+                                        className="w-[42px] h-[42px] rounded-full"
+                                        imgSrc={item.fndAcptURL}
+                                      />
+                                    </image>
+                                  ) : (
+                                    <image>
+                                      <Image
+                                        className="w-[42px] h-[42px] rounded-full"
+                                        imgSrc="assets/wx1.png"
+                                      />
+                                    </image>
+                                  )}
+                                  <div className="ml-1">
+                                    <h4 className="font-bar font-bold text-[12px]">
+                                      {item.fndAcptName}
+                                    </h4>
+                                    <p className="font-bar font-semibold text-[10px] text-[#181818]">
+                                      @ {item.fndAcptABout}
+                                    </p>
+                                  </div>
+                                </div>
+                                <div className="w-[90px] justify-between top-[5px] right-[-95px] absolute flex">
+                                  <button
+                                    onClick={"() => acceptRequ(item)"}
+                                    className="cursor-pointer px-[2px] bg-[#0E6795] text-white font-bar text-[12px] font-semibold rounded-[4px]"
+                                  >
+                                    Block
+                                  </button>
+                                  <button
+                                    onClick={() => unfriendFun(item)}
+                                    className="cursor-pointer px-[2px] bg-[#0E6795] text-white font-bar text-[12px] font-semibold rounded-[4px]"
+                                  >
+                                    Unfriend
+                                  </button>
+                                </div>
+                              </div>
+                            )
+                        )}
+                      </AccordionItemPanel>
+                    </AccordionItem>
+                  </Accordion>
+                </div>
+
+                <div className="w-[355px]">
+                  {" "}
+                  <Accordion>
+                    <AccordionItem>
+                      <AccordionItemHeading>
+                        <AccordionItemButton>User list</AccordionItemButton>
+                      </AccordionItemHeading>
+                      <AccordionItemPanel className="h-[250px]  overflow-y-scroll">
+                        {userList.map((item) => (
+                          <div
+                            key={item.uid}
+                            className="mb-3 border-b pb-1 w-[130px] border-black  "
+                          >
+                            <div className="flex w-[110x] justify-between ">
+                              {item.photoURL ? (
+                                <image>
+                                  <Image
+                                    className="w-[42px] h-[42px] rounded-full"
+                                    imgSrc={item.photoURL}
+                                  />
+                                </image>
+                              ) : (
+                                <image>
+                                  <Image
+                                    className="w-[42px] h-[42px] rounded-full"
+                                    imgSrc="assets/wx1.png"
+                                  />
+                                </image>
+                              )}
+                              <div className="ml-1">
+                                <h4 className="font-bar font-bold text-[12px]">
+                                  {item.displayName}
+                                </h4>
+                                <p className="font-bar font-semibold text-[10px] text-[#181818]">
+                                  @ {item.about}
+                                </p>
+                              </div>
+
+                              <div className="w-[40px]">
+                                <button
+                                  onClick={() => handleUserList(item)}
+                                  className="cursor-pointer px-[2px] bg-[#0E6795] text-white font-bar text-[12px] font-semibold rounded-[4px]"
+                                >
+                                  Request
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </AccordionItemPanel>
+                    </AccordionItem>
+                    <AccordionItem>
+                      <AccordionItemHeading>
+                        <AccordionItemButton>
+                          Friends Request{" "}
+                          <span className="pl-2 text-[#0E6795] font-bar font-semibold">
+                            {" "}
+                            {
+                              reqShow.filter(
+                                (item) =>
+                                  item.receiverId ===
+                                  reduxReturnData.userStoreData.userInfo.uid
+                              ).length
+                            }
+                          </span>
+                        </AccordionItemButton>
+                      </AccordionItemHeading>
+                      <AccordionItemPanel className="h-[250px]  overflow-y-scroll">
+                        {reqShow.map((item) => (
+                          <div
+                            key={item.uid}
+                            className="mb-3 border-b pb-1 w-[120px] border-black relative "
+                          >
+                            <div className="flex w-[100x] gap-x-2 ">
+                              {item.photoURL ? (
+                                <image>
+                                  <Image
+                                    className="w-[42px] h-[42px] rounded-full"
+                                    imgSrc={item.photoURL}
+                                  />
+                                </image>
+                              ) : (
+                                <image>
+                                  <Image
+                                    className="w-[42px] h-[42px] rounded-full"
+                                    imgSrc="assets/wx1.png"
+                                  />
+                                </image>
+                              )}
+                              <div className="ml-1">
+                                <h4 className="font-bar font-bold text-[12px]">
+                                  {item.displayName}
+                                </h4>
+                                <p className="font-bar font-semibold text-[10px] text-[#181818]">
+                                  @ {item.about} hnhh
+                                </p>
+                              </div>
+                            </div>
+                            <div className="w-[90px] justify-between top-[5px] right-[-95px] absolute flex">
                               <button
                                 onClick={() => handleUserList(item)}
                                 className="cursor-pointer px-[2px] bg-[#0E6795] text-white font-bar text-[12px] font-semibold rounded-[4px]"
                               >
-                                Request
+                                Accept
+                              </button>
+                              <button
+                                onClick={() => handleUserList(item)}
+                                className="cursor-pointer px-[2px] bg-[#0E6795] text-white font-bar text-[12px] font-semibold rounded-[4px]"
+                              >
+                                Delete
                               </button>
                             </div>
                           </div>
-                        </div>
-                      ))}
-                    </AccordionItemPanel>
-                  </AccordionItem>
-                  <AccordionItem>
-                    <AccordionItemHeading>
-                      <AccordionItemButton>Friends Request <span className="pl-2 text-[#0E6795] font-bar font-semibold"> {reqShow.filter((item)=>item.receiverId===reduxReturnData.userStoreData.userInfo.uid).length}</span></AccordionItemButton>
-                    </AccordionItemHeading>
-                    <AccordionItemPanel className="h-[250px]  overflow-y-scroll">
-                      {reqShow.map((item) => (
-                        <div
-                          key={item.uid}
-                          className="mb-3 border-b pb-1 w-[120px] border-black relative "
-                        >
-                          <div className="flex w-[100x] gap-x-2 ">
-                            {item.photoURL ? (
-                              <image>
-                                <Image
-                                  className="w-[42px] h-[42px] rounded-full"
-                                  imgSrc={item.photoURL}
-                                />
-                              </image>
-                            ) : (
-                              <image>
-                                <Image
-                                  className="w-[42px] h-[42px] rounded-full"
-                                  imgSrc="assets/wx1.png"
-                                />
-                              </image>
-                            )}
-                            <div className="ml-1">
-                              <h4 className="font-bar font-bold text-[12px]">rrg fgdgfdg
-                                {item.displayName}
-                              </h4>
-                              <p className="font-bar font-semibold text-[10px] text-[#181818]">
-                                @ {item.about} hnhh
-                              </p>
-                            </div>
-                          </div>
-                          <div className="w-[90px] justify-between top-[5px] right-[-95px] absolute flex">
-                            <button
-                              onClick={() => handleUserList(item)}
-                              className="cursor-pointer px-[2px] bg-[#0E6795] text-white font-bar text-[12px] font-semibold rounded-[4px]"
-                            >
-                              Accept
-                            </button>
-                            <button
-                              onClick={() => handleUserList(item)}
-                              className="cursor-pointer px-[2px] bg-[#0E6795] text-white font-bar text-[12px] font-semibold rounded-[4px]"
-                            >
-                              Delete
-                            </button>
-                          </div>
-                        </div>
-                      ))}
-                    </AccordionItemPanel>
-                  </AccordionItem>
-                </Accordion>
+                        ))}
+                      </AccordionItemPanel>
+                    </AccordionItem>
+                  </Accordion>
+                </div>
               </div>
             </div>
           </div>
