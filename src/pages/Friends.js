@@ -143,7 +143,7 @@ const Friends = () => {
       fndAcptURL: reduxReturnData.userStoreData.userInfo.photoURL,
       fndAcptEmail: item.receiverEmail,
       fndAcptABout: item.receiverAbout,
-      frnAcptLoc: item.receiverLoc,
+      fndAcptLoc: item.receiverLoc,
       reqId: item.uid,
     }).then(() => {
       remove(ref(db, "fndRequest/" + item.uid));
@@ -190,7 +190,72 @@ const Friends = () => {
       remove(ref(db, "friends/" + item.fndUid));
     }
   };
-  //################ unfriend fun end #########
+  //################ unfriend fun end ###########
+
+  //################ block friend fun start ###########
+
+  //############# all user call ####
+  let [uList, setUList] = useState([]);
+
+  useEffect(() => {
+    const userref = ref(db, "users/");
+
+    onValue(userref, (snapshot) => {
+      let arr = [];
+      snapshot.forEach((item) => {
+        console.log(item.key);
+
+        arr.push({ ...item.val(), uid: item.key });
+      });
+      setUList(arr);
+    });
+  }, []);
+  console.log(uList);
+  //############# all user call ####
+
+  let blockFndFun = (item) => {
+    console.log(item);
+    if (item.fndAcptId === reduxReturnData.userStoreData.userInfo.uid) {
+      set(push(ref(db, "blockFnd/")), {
+        blockByName: item.fndAcptName,
+        blockById: item.fndAcptId,
+        blockByURL: item.fndAcptURL,
+        blockByAbout: item.fndAcptABout,
+        blockByEmail: item.fndAcptEmail,
+        blockByLoc: item.fndAcptLoc,
+
+        blockedId: item.friendId,
+        blockedName: item.friendName,
+        blockedURL: item.friendURL,
+        blockedEmail: item.friendEmail,
+        blockedAbout: item.friendAbout,
+        blockedLoc: item.friendLoc,
+      }).then(() => {
+        console.log("acpter Rem");
+      });
+    }
+
+    if (item.friendId === reduxReturnData.userStoreData.userInfo.uid) {
+      set(push(ref(db, "blockFnd/")), {
+        blockByName: item.friendName,
+        blockById: item.friendId,
+        blockByURL: item.friendURL,
+        blockByAbout: item.friendAbout,
+        blockByEmail: item.friendEmail,
+        blockByLoc: item.friendLoc,
+
+        blockedId: item.fndAcptId,
+        blockedName: item.fndAcptName,
+        blockedURL: item.fndAcptURL,
+        blockedEmail: item.fndAcptEmail,
+        blockedAbout: item.fndAcptABout,
+        blockedLoc: item.fndAcptLoc,
+      }).then(() => {
+        console.log("acpter Rem");
+      });
+    }
+  };
+  //################ block friend fun end ###########
 
   return (
     <>
@@ -464,7 +529,7 @@ const Friends = () => {
                                 </div>
                                 <div className="w-[90px] justify-between top-[5px] right-[-95px] absolute flex">
                                   <button
-                                    onClick={"() => acceptRequ(item)"}
+                                    onClick={() => blockFndFun(item)}
                                     className="cursor-pointer px-[2px] bg-[#0E6795] text-white font-bar text-[12px] font-semibold rounded-[4px]"
                                   >
                                     Block
@@ -515,7 +580,7 @@ const Friends = () => {
                                 </div>
                                 <div className="w-[90px] justify-between top-[5px] right-[-95px] absolute flex">
                                   <button
-                                    onClick={"() => acceptRequ(item)"}
+                                    onClick={() => blockFndFun(item)}
                                     className="cursor-pointer px-[2px] bg-[#0E6795] text-white font-bar text-[12px] font-semibold rounded-[4px]"
                                   >
                                     Block
