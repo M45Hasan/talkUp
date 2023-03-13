@@ -255,6 +255,23 @@ const Friends = () => {
       });
     }
   };
+
+
+  //###### block arr ####
+  let [bShow,setBlock]=useState([])
+  
+  useEffect(()=>{
+    const useRef=ref(db,"blockFnd/")
+    onValue(useRef,(snapshot)=>{
+      let arr=[]
+      snapshot.forEach((item)=>{
+     arr.push({...item.val(),blockUid:item.key})
+      })
+      setBlock(arr)
+    })
+  },[])
+  console.log(bShow)
+
   //################ block friend fun end ###########
 
   return (
@@ -597,6 +614,124 @@ const Friends = () => {
                         )}
                       </AccordionItemPanel>
                     </AccordionItem>
+
+                    <AccordionItem>
+                      <AccordionItemHeading>
+                        <AccordionItemButton>
+                         Block List
+                          <span className="pl-2 text-[#0E6795] font-bar font-semibold">
+                            {" "}
+                            {
+                              bShow.filter((item) =>
+                                item.blockById ===
+                                reduxReturnData.userStoreData.userInfo.uid
+                               
+                              ).length
+                            }
+                          </span>
+                        </AccordionItemButton>
+                      </AccordionItemHeading>
+                      <AccordionItemPanel className="h-[250px]  overflow-y-scroll">
+                        {bShow.map(
+                          (item) =>
+                            item.blockById ===
+                              reduxReturnData.userStoreData.userInfo.uid && (
+                              <div
+                                key={item.blockedId}
+                                className="mb-3 border-b pb-1 w-[120px] border-black relative "
+                              >
+                                <div className="flex w-[100x] gap-x-2 ">
+                                  {item.blockedURL ? (
+                                    <image>
+                                      <Image
+                                        className="w-[42px] h-[42px] rounded-full"
+                                        imgSrc={item.blockedURL}
+                                      />
+                                    </image>
+                                  ) : (
+                                    <image>
+                                      <Image
+                                        className="w-[42px] h-[42px] rounded-full"
+                                        imgSrc="assets/wx1.png"
+                                      />
+                                    </image>
+                                  )}
+                                  <div className="ml-1">
+                                    <h4 className="font-bar font-bold text-[12px]">
+                                      {item.blockedName}
+                                    </h4>
+                                    <p className="font-bar font-semibold text-[10px] text-[#181818]">
+                                      @ {item.blockedAbout}
+                                    </p>
+                                  </div>
+                                </div>
+                                <div className="w-[90px] justify-between top-[5px] right-[-95px] absolute flex">
+                                  <button
+                                    onClick={"()=>UnBlockFn(item)"}
+                                    className="cursor-pointer px-[2px] bg-[#0E6795] text-white font-bar text-[12px] font-semibold rounded-[4px]"
+                                  >
+                                    Unblock
+                                  </button>
+                                  
+                                </div>
+                              </div>
+                            )
+                        )}
+
+                        {frnShow.map(
+                          (item) =>
+                            item.friendId ===
+                              reduxReturnData.userStoreData.userInfo.uid && (
+                              <div
+                                key={item.friendId}
+                                className="mb-3 border-b pb-1 w-[120px] border-black relative "
+                              >
+                                <div className="flex w-[100x] gap-x-2 ">
+                                  {item.fndAcptURL ? (
+                                    <image>
+                                      <Image
+                                        className="w-[42px] h-[42px] rounded-full"
+                                        imgSrc={item.fndAcptURL}
+                                      />
+                                    </image>
+                                  ) : (
+                                    <image>
+                                      <Image
+                                        className="w-[42px] h-[42px] rounded-full"
+                                        imgSrc="assets/wx1.png"
+                                      />
+                                    </image>
+                                  )}
+                                  <div className="ml-1">
+                                    <h4 className="font-bar font-bold text-[12px]">
+                                      {item.fndAcptName}
+                                    </h4>
+                                    <p className="font-bar font-semibold text-[10px] text-[#181818]">
+                                      @ {item.fndAcptABout}
+                                    </p>
+                                  </div>
+                                </div>
+                                <div className="w-[90px] justify-between top-[5px] right-[-95px] absolute flex">
+                                  <button
+                                    onClick={() => blockFndFun(item)}
+                                    className="cursor-pointer px-[2px] bg-[#0E6795] text-white font-bar text-[12px] font-semibold rounded-[4px]"
+                                  >
+                                    Block
+                                  </button>
+                                  <button
+                                    onClick={() => unfriendFun(item)}
+                                    className="cursor-pointer px-[2px] bg-[#0E6795] text-white font-bar text-[12px] font-semibold rounded-[4px]"
+                                  >
+                                    Unfriend
+                                  </button>
+                                </div>
+                              </div>
+                            )
+                        )}
+                      </AccordionItemPanel>
+                    </AccordionItem>
+
+
                   </Accordion>
                 </div>
 
