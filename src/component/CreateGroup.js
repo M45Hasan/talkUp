@@ -30,6 +30,7 @@ const CreateGroup = () => {
   });
 
   let handleChange = (e) => {
+    setShow(false);
     let { name, value } = e.target;
 
     setData({
@@ -40,54 +41,58 @@ const CreateGroup = () => {
   console.log(formData);
   //########## handle Change end ######
   // ##################### Group Imgae start dataBase ######
+  let [show, setShow] = useState(false);
   const [imageUpload, setImageUpload] = useState(null);
   let handleCreate = (e) => {
-    if (imageUpload == null) {
-      set(push(ref(db, "userGroup/")), {
-        gpTitle: formData.title,
-        gpAbout: formData.about,
-        createrId: reduxReturnData.userStoreData.userInfo.uid,
-        createrName: reduxReturnData.userStoreData.userInfo.displayName,
-        createrURL: reduxReturnData.userStoreData.userInfo.photoURL,
-      }).then(() => {
-        setData({
-          title: "",
-          about: "",
+    if (formData.title !== "") {
+      if (imageUpload == null) {
+        set(push(ref(db, "userGroup/")), {
+          gpTitle: formData.title,
+          gpAbout: formData.about,
+          createrId: reduxReturnData.userStoreData.userInfo.uid,
+          createrName: reduxReturnData.userStoreData.userInfo.displayName,
+          createrURL: reduxReturnData.userStoreData.userInfo.photoURL,
+        }).then(() => {
+          setData({
+            title: "",
+            about: "",
+          });
+          setImageUpload("");
+          formData.title = " ";
+          formData.about = " ";
+          imageUpload("");
+          setImageUpload("");
         });
-        setImageUpload("");
-        formData.title = " ";
-        formData.about = " ";
-        imageUpload("");
-        setImageUpload("");
-      });
-    } else {
-      const imageRef = def(
-        storage,
-        `userGroup/${reduxReturnData.userStoreData.userInfo.uid} /${v4()}`
-      );
-      uploadBytes(imageRef, imageUpload).then((snapshot) => {
-        getDownloadURL(snapshot.ref).then((url) => {
-          console.log("url", url);
-          set(push(ref(db, "userGroup/")), {
-            gpTitle: formData.title,
-            gpAbout: formData.about,
-            createrId: reduxReturnData.userStoreData.userInfo.uid,
-            createrName: reduxReturnData.userStoreData.userInfo.displayName,
-            createrURL: reduxReturnData.userStoreData.userInfo.photoURL,
-            gpURL: url,
-          }).then(() => {
-            setData({
-              title: "",
-              about: "",
+      } else {
+        const imageRef = def(
+          storage,
+          `userGroup/${reduxReturnData.userStoreData.userInfo.uid} /${v4()}`
+        );
+        uploadBytes(imageRef, imageUpload).then((snapshot) => {
+          getDownloadURL(snapshot.ref).then((url) => {
+            console.log("url", url);
+            set(push(ref(db, "userGroup/")), {
+              gpTitle: formData.title,
+              gpAbout: formData.about,
+              createrId: reduxReturnData.userStoreData.userInfo.uid,
+              createrName: reduxReturnData.userStoreData.userInfo.displayName,
+              createrURL: reduxReturnData.userStoreData.userInfo.photoURL,
+              gpURL: url,
+            }).then(() => {
+              setData({
+                title: "",
+                about: "",
+              });
+              formData.title = " ";
+              formData.about = " ";
+              imageUpload("");
+              setImageUpload("");
             });
-            formData.title = " ";
-            formData.about = " ";
-            imageUpload("");
-            setImageUpload("");
           });
         });
-      });
+      }
     }
+    setShow(true);
   };
 
   // ##################### Group Imgae end dataBase ######
@@ -159,12 +164,22 @@ const CreateGroup = () => {
       </div>
 
       <div className="m-2">
-        <p
-          className=" text-center  p-1 bg-[#086FA4] text-[#FFFFFF] cursor-pointer hover:bg-cyan-600 font-nuni font-semibold border border-solid border-orange-600  text-base h-8 rounded-[4px]"
-          onClick={handleCreate}
-        >
-          Create
-        </p>
+        {formData.title ? (
+          <p
+            className=" text-center  p-1 bg-[#086FA4] text-[#FFFFFF] cursor-pointer hover:bg-cyan-600 font-nuni font-semibold border border-solid border-orange-600  text-base h-8 rounded-[4px]"
+            onClick={handleCreate}
+          >
+            Create
+          </p>
+        ) : show ? (
+          <p className=" text-center  p-1 bg-[#086FA4] text-[#FFFFFF] cursor-pointer hover:bg-cyan-600 font-nuni font-semibold border border-solid border-orange-600  text-base h-8 rounded-[4px]">
+            Created
+          </p>
+        ) : (
+          <p className=" text-center  p-1 bg-[#086FA4] text-[#FFFFFF] cursor-pointer hover:bg-cyan-600 font-nuni font-semibold border border-solid border-orange-600  text-base h-8 rounded-[4px]">
+            Create
+          </p>
+        )}
       </div>
     </>
   );
