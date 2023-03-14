@@ -20,6 +20,7 @@ import {
   AccordionItemPanel,
 } from "react-accessible-accordion";
 import "react-accessible-accordion/dist/fancy-example.css";
+import CreateGroup from "../component/CreateGroup";
 
 const Friends = () => {
   let navigate = useNavigate();
@@ -257,6 +258,7 @@ const Friends = () => {
   };
 
   //###### block arr ####
+
   let [bShow, setBlock] = useState([]);
 
   useEffect(() => {
@@ -271,7 +273,29 @@ const Friends = () => {
   }, []);
   console.log(bShow);
 
+  //###### block button arr ####
+
+  let [bbShow, setBb] = useState([]);
+  useEffect(() => {
+    const useRef = ref(db, "blockFnd/");
+    onValue(useRef, (snapshot) => {
+      let arr = []; 
+
+      snapshot.forEach((item) => { 
+        arr.push(item.val().blockById + item.val().blockedId);
+      });
+      setBb(arr);
+    });
+  }, []);
+  console.log(bbShow);
+
   //################ block friend fun end ###########
+
+  //################ Unblock func start ###########
+  let UnBlockFn = (item) => {
+    remove(ref(db, "blockFnd/" + item.blockUid));
+  };
+  //################ Unblock func  end ###########
 
   return (
     <>
@@ -342,10 +366,10 @@ const Friends = () => {
                           >
                             <div className="flex w-[202px] justify-between ">
                               {item.photoURL ? (
-                                <div className="w-[40px] border-[1px] border-orange-600 rounded-full">
+                                <div className="w-[42px] ">
                                   <image>
                                     <Image
-                                      className="w-[40px] h-[40px] rounded-full"
+                                      className="w-[40px] border-[1px] border-orange-600  h-[40px] rounded-full"
                                       imgSrc={item.photoURL}
                                     />
                                   </image>
@@ -353,7 +377,7 @@ const Friends = () => {
                               ) : (
                                 <image>
                                   <Image
-                                    className="w-[40px] h-[40px] rounded-full"
+                                    className="w-[40px] h-[40px] border-[1px] border-orange-600 rounded-full"
                                     imgSrc="assets/wx1.png"
                                   />
                                 </image>
@@ -399,11 +423,22 @@ const Friends = () => {
                                       reduxReturnData.userStoreData.userInfo.uid
                                   ) ||
                                   fnShow.includes(
+                                    item.uid +
+                                      reduxReturnData.userStoreData.userInfo.uid
+                                  ) ? (
+                                  <button className="cursor-pointer px-[2px] bg-[#0E6795] text-white font-bar text-[12px] font-semibold rounded-[4px]">
+                                    Friend
+                                  </button>
+                                ) : bbShow.includes(
+                                    item.uid +
+                                      reduxReturnData.userStoreData.userInfo.uid
+                                  ) ||
+                                  bbShow.includes(
                                     reduxReturnData.userStoreData.userInfo.uid +
                                       item.uid
                                   ) ? (
                                   <button className="cursor-pointer px-[2px] bg-[#0E6795] text-white font-bar text-[12px] font-semibold rounded-[4px]">
-                                    Friend
+                                    Blocked
                                   </button>
                                 ) : (
                                   <button
@@ -449,14 +484,14 @@ const Friends = () => {
                                   {item.requSenderURL ? (
                                     <image>
                                       <Image
-                                        className="w-[42px] h-[42px] rounded-full"
+                                        className="w-[42px] h-[42px] border-[1px] border-orange-600 rounded-full"
                                         imgSrc={item.requSenderURL}
                                       />
                                     </image>
                                   ) : (
                                     <image>
                                       <Image
-                                        className="w-[42px] h-[42px] rounded-full"
+                                        className="w-[42px] h-[42px] border-[1px] border-orange-600 rounded-full"
                                         imgSrc="assets/wx1.png"
                                       />
                                     </image>
@@ -522,14 +557,14 @@ const Friends = () => {
                                   {item.friendURL ? (
                                     <image>
                                       <Image
-                                        className="w-[42px] h-[42px] rounded-full"
+                                        className="w-[42px] h-[42px] border-[1px] border-orange-600 rounded-full"
                                         imgSrc={item.friendURL}
                                       />
                                     </image>
                                   ) : (
                                     <image>
                                       <Image
-                                        className="w-[42px] h-[42px] rounded-full"
+                                        className="w-[42px] h-[42px] border-[1px] border-orange-600 rounded-full"
                                         imgSrc="assets/wx1.png"
                                       />
                                     </image>
@@ -573,14 +608,14 @@ const Friends = () => {
                                   {item.fndAcptURL ? (
                                     <image>
                                       <Image
-                                        className="w-[42px] h-[42px] rounded-full"
+                                        className="w-[42px] h-[42px] border-[1px] border-orange-600 rounded-full"
                                         imgSrc={item.fndAcptURL}
                                       />
                                     </image>
                                   ) : (
                                     <image>
                                       <Image
-                                        className="w-[42px] h-[42px] rounded-full"
+                                        className="w-[42px] h-[42px] border-[1px] border-orange-600 rounded-full"
                                         imgSrc="assets/wx1.png"
                                       />
                                     </image>
@@ -643,14 +678,14 @@ const Friends = () => {
                                   {item.blockedURL ? (
                                     <image>
                                       <Image
-                                        className="w-[42px] h-[42px] rounded-full"
+                                        className="w-[42px] h-[42px] border-[1px] border-orange-600 rounded-full"
                                         imgSrc={item.blockedURL}
                                       />
                                     </image>
                                   ) : (
                                     <image>
                                       <Image
-                                        className="w-[42px] h-[42px] rounded-full"
+                                        className="w-[42px] h-[42px] border-[1px] border-orange-600 rounded-full"
                                         imgSrc="assets/wx1.png"
                                       />
                                     </image>
@@ -666,7 +701,7 @@ const Friends = () => {
                                 </div>
                                 <div className="w-[90px] justify-between top-[5px] right-[-95px] absolute flex">
                                   <button
-                                    onClick={"()=>UnBlockFn(item)"}
+                                    onClick={() => UnBlockFn(item)}
                                     className="cursor-pointer px-[2px] bg-[#0E6795] text-white font-bar text-[12px] font-semibold rounded-[4px]"
                                   >
                                     Unblock
@@ -675,62 +710,19 @@ const Friends = () => {
                               </div>
                             )
                         )}
-
-
                       </AccordionItemPanel>
                     </AccordionItem>
                   </Accordion>
                 </div>
 
                 <div className="w-[355px]">
-                  {" "}
                   <Accordion>
                     <AccordionItem>
                       <AccordionItemHeading>
-                        <AccordionItemButton>User list</AccordionItemButton>
+                        <AccordionItemButton>Create Group</AccordionItemButton>
                       </AccordionItemHeading>
                       <AccordionItemPanel className="h-[250px]  overflow-y-scroll">
-                        {userList.map((item) => (
-                          <div
-                            key={item.uid}
-                            className="mb-3 border-b pb-1 w-[130px] border-black  "
-                          >
-                            <div className="flex w-[110x] justify-between ">
-                              {item.photoURL ? (
-                                <image>
-                                  <Image
-                                    className="w-[42px] h-[42px] rounded-full"
-                                    imgSrc={item.photoURL}
-                                  />
-                                </image>
-                              ) : (
-                                <image>
-                                  <Image
-                                    className="w-[42px] h-[42px] rounded-full"
-                                    imgSrc="assets/wx1.png"
-                                  />
-                                </image>
-                              )}
-                              <div className="ml-1">
-                                <h4 className="font-bar font-bold text-[12px]">
-                                  {item.displayName}
-                                </h4>
-                                <p className="font-bar font-semibold text-[10px] text-[#181818]">
-                                  @ {item.about}
-                                </p>
-                              </div>
-
-                              <div className="w-[40px]">
-                                <button
-                                  onClick={() => handleUserList(item)}
-                                  className="cursor-pointer px-[2px] bg-[#0E6795] text-white font-bar text-[12px] font-semibold rounded-[4px]"
-                                >
-                                  Request
-                                </button>
-                              </div>
-                            </div>
-                          </div>
-                        ))}
+                        <CreateGroup />
                       </AccordionItemPanel>
                     </AccordionItem>
                     <AccordionItem>
