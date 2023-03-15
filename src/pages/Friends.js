@@ -279,9 +279,9 @@ const Friends = () => {
   useEffect(() => {
     const useRef = ref(db, "blockFnd/");
     onValue(useRef, (snapshot) => {
-      let arr = []; 
+      let arr = [];
 
-      snapshot.forEach((item) => { 
+      snapshot.forEach((item) => {
         arr.push(item.val().blockById + item.val().blockedId);
       });
       setBb(arr);
@@ -296,6 +296,54 @@ const Friends = () => {
     remove(ref(db, "blockFnd/" + item.blockUid));
   };
   //################ Unblock func  end ###########
+
+  //################ Group func  start ###########
+  let [groupShow, setGroup] = useState([]);
+
+  useEffect(() => {
+    const useRef = ref(db, "userGroup");
+    onValue(useRef, (snapshot) => {
+      let arr = [];
+      snapshot.forEach((item) => {
+        if (
+          item.val().createrId === reduxReturnData.userStoreData.userInfo.uid
+        ) {
+          arr.push({ ...item.val(), gpUid: item.key });
+        }
+      });
+      setGroup(arr);
+    });
+  }, []);
+  console.log(groupShow);
+  //################ Group func  end ###########
+
+  //################ Group del   start ###########
+  let groupDel = (item) => {
+    console.log(item);
+
+    remove(ref(db, "userGroup/" + item.gpUid));
+  };
+  //################ Group  del  end ###########
+
+  //################ All Group start ###########
+  let [allgShow, setAllg] = useState([]);
+
+  useEffect(() => {
+    const useRef = ref(db, "userGroup");
+    onValue(useRef, (snapshot) => {
+      let arr = [];
+      snapshot.forEach((item) => {
+        if (
+          item.val().createrId !== reduxReturnData.userStoreData.userInfo.uid
+        ) {
+          arr.push({ ...item.val(), allgUid: item.key });
+        }
+      });
+      setAllg(arr);
+    });
+  }, []);
+  console.log(allgShow);
+  //################ All Group  end ###########
 
   return (
     <>
@@ -665,6 +713,7 @@ const Friends = () => {
                           </span>
                         </AccordionItemButton>
                       </AccordionItemHeading>
+
                       <AccordionItemPanel className="h-[250px]  overflow-y-scroll">
                         {bShow.map(
                           (item) =>
@@ -728,13 +777,13 @@ const Friends = () => {
                     <AccordionItem>
                       <AccordionItemHeading>
                         <AccordionItemButton>
-                          Friends Request{" "}
+                          My Group
                           <span className="pl-2 text-[#0E6795] font-bar font-semibold">
                             {" "}
                             {
-                              reqShow.filter(
-                                (item) =>
-                                  item.receiverId ===
+                              groupShow.filter(
+                                (em) =>
+                                  em.createrId ===
                                   reduxReturnData.userStoreData.userInfo.uid
                               ).length
                             }
@@ -742,45 +791,101 @@ const Friends = () => {
                         </AccordionItemButton>
                       </AccordionItemHeading>
                       <AccordionItemPanel className="h-[250px]  overflow-y-scroll">
-                        {reqShow.map((item) => (
+                        {groupShow.map((item) => (
                           <div
-                            key={item.uid}
-                            className="mb-3 border-b pb-1 w-[120px] border-black relative "
+                            key={item.gpUid}
+                            className="mb-3 flex  border-b pb-1 w-[160px] border-black relative "
                           >
-                            <div className="flex w-[100x] gap-x-2 ">
-                              {item.photoURL ? (
-                                <image>
+                            <div className="w-[40px] flex relative gap-x-1">
+                              <div>
+                                <image className="absolute z-0 bottom-0 left-[18px]">
                                   <Image
-                                    className="w-[42px] h-[42px] rounded-full"
-                                    imgSrc={item.photoURL}
+                                    className="w-[20px] h-[20px] border-[1px] border-orange-600   rounded-full"
+                                    imgSrc={item.gpURL}
                                   />
                                 </image>
-                              ) : (
-                                <image>
+
+                                <image className="">
                                   <Image
-                                    className="w-[42px] h-[42px] rounded-full"
-                                    imgSrc="assets/wx1.png"
+                                    className="w-[35px] h-[35px] border-[1px] border-orange-600  rounded-full"
+                                    imgSrc={item.createrURL}
                                   />
                                 </image>
-                              )}
-                              <div className="ml-1">
-                                <h4 className="font-bar font-bold text-[12px]">
-                                  {item.displayName}
-                                </h4>
-                                <p className="font-bar font-semibold text-[10px] text-[#181818]">
-                                  @ {item.about} hnhh
-                                </p>
                               </div>
                             </div>
+                            <div className="ml-1 ">
+                              <h4 className="font-bar font-bold text-[12px]">
+                                {item.gpTitle}
+                              </h4>
+                              <p className="font-bar font-semibold text-[10px] text-[#181818]">
+                                @ {item.gpAbout}
+                              </p>
+                            </div>
+
                             <div className="w-[90px] justify-between top-[5px] right-[-95px] absolute flex">
                               <button
-                                onClick={() => handleUserList(item)}
+                                onClick={() => groupDel(item)}
                                 className="cursor-pointer px-[2px] bg-[#0E6795] text-white font-bar text-[12px] font-semibold rounded-[4px]"
                               >
-                                Accept
+                                Delete
                               </button>
+                            </div>
+                          </div>
+                        ))}
+                      </AccordionItemPanel>
+                    </AccordionItem>
+
+                    <AccordionItem>
+                      <AccordionItemHeading>
+                        <AccordionItemButton>
+                          All Group
+                          <span className="pl-2 text-[#0E6795] font-bar font-semibold">
+                            {" "}
+                            {
+                              allgShow.filter(
+                                (em) =>
+                                  em.createrId !==
+                                  reduxReturnData.userStoreData.userInfo.uid
+                              ).length
+                            }
+                          </span>
+                        </AccordionItemButton>
+                      </AccordionItemHeading>
+                      <AccordionItemPanel className="h-[250px]  overflow-y-scroll">
+                        {allgShow.map((item) => (
+                          <div
+                            key={item.allgUid}
+                            className="mb-3 flex  border-b pb-1 w-[160px] border-black relative "
+                          >
+                            <div className="w-[40px] flex relative gap-x-1">
+                              <div>
+                                <image className="absolute z-0 bottom-0 left-[18px]">
+                                  <Image
+                                    className="w-[20px] h-[20px] border-[1px] border-orange-600   rounded-full"
+                                    imgSrc={item.gpURL}
+                                  />
+                                </image>
+
+                                <image className="">
+                                  <Image
+                                    className="w-[35px] h-[35px] border-[1px] border-orange-600  rounded-full"
+                                    imgSrc={item.createrURL}
+                                  />
+                                </image>
+                              </div>
+                            </div>
+                            <div className="ml-1 ">
+                              <h4 className="font-bar font-bold text-[12px]">
+                                {item.gpTitle}
+                              </h4>
+                              <p className="font-bar font-semibold text-[10px] text-[#181818]">
+                                @ {item.gpAbout}
+                              </p>
+                            </div>
+
+                            <div className="w-[90px] justify-between top-[5px] right-[-95px] absolute flex">
                               <button
-                                onClick={() => handleUserList(item)}
+                                onClick={() => groupDel(item)}
                                 className="cursor-pointer px-[2px] bg-[#0E6795] text-white font-bar text-[12px] font-semibold rounded-[4px]"
                               >
                                 Delete

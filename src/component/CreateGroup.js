@@ -1,12 +1,5 @@
-import React, { useEffect, useState } from "react";
-import {
-  getDatabase,
-  ref,
-  set,
-  push,
-  update,
-  onValue,
-} from "firebase/database";
+import React, { useState } from "react";
+import { getDatabase, ref, set, push } from "firebase/database";
 import { useSelector } from "react-redux";
 import {
   ref as def,
@@ -60,7 +53,7 @@ const CreateGroup = () => {
           setImageUpload("");
           formData.title = " ";
           formData.about = " ";
-          imageUpload("");
+          imageUpload(null);
           setImageUpload("");
         });
       } else {
@@ -85,7 +78,7 @@ const CreateGroup = () => {
               });
               formData.title = " ";
               formData.about = " ";
-              imageUpload("");
+              imageUpload(null);
               setImageUpload("");
             });
           });
@@ -155,8 +148,10 @@ const CreateGroup = () => {
       <div className=" m-2">
         <input
           type="file"
+          placeholder="none"
           className=" font-nuni text-[#11175D] text-sm font-bold"
           name="groupPhoto"
+          
           onChange={(event) => {
             setImageUpload(event.target.files[0]);
           }}
