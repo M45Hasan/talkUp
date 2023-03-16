@@ -345,6 +345,50 @@ const Friends = () => {
   console.log(allgShow);
   //################ All Group  end ###########
 
+  //################ Join Group  start ###########
+
+  let joinGroup = (item) => {
+    console.log(item.gpURL);
+    set(push(ref(db, "groupMem/")), {
+      gpTitle: item.gpTitle,
+      gpAbout: item.gpAbout,
+      gpId: item.allgUid,
+      createrId: item.createrId,
+      createrName: item.createrName,
+      createrURL: item.createrURL,
+      gpURL: item.gpURL,
+      gMemberId: reduxReturnData.userStoreData.userInfo.uid,
+      gMemberName: reduxReturnData.userStoreData.userInfo.displayName,
+      gMemberURL: reduxReturnData.userStoreData.userInfo.photoURL,
+    }).then(() => {});
+    setButMem(item.allgUid);
+  };
+
+  //#######Join arr start ####
+  let [member, setMem] = useState([]);
+
+  useEffect(() => {
+    const useRef = ref(db, "groupMem/");
+    onValue(useRef, (snapshot) => {
+      let arr = [];
+      snapshot.forEach((item) => {
+        if (
+          item.val().gMemberId === reduxReturnData.userStoreData.userInfo.uid
+        ) {
+          arr.push({ ...item.val(), gmId: item.key });
+        }
+      });
+      setMem(arr);
+    });
+  }, []);
+  console.log(member);
+  //#######Join arr end ####
+  //#######Join ButtonArr start####
+  let [butMem, setButMem] = useState(false);
+
+  //#######Join ButtonArr end ####
+  //################ Join Group  end ###########
+
   return (
     <>
       <div className="flex justify-between w-max  pl-[86px]">
@@ -780,13 +824,16 @@ const Friends = () => {
                           My Group
                           <span className="pl-2 text-[#0E6795] font-bar font-semibold">
                             {" "}
-                            {
-                              groupShow.filter(
-                                (em) =>
-                                  em.createrId ===
+                            {groupShow.filter(
+                              (em) =>
+                                em.createrId ===
+                                reduxReturnData.userStoreData.userInfo.uid
+                            ).length +
+                              member.filter(
+                                (eom) =>
+                                  eom.gMemberId ===
                                   reduxReturnData.userStoreData.userInfo.uid
-                              ).length
-                            }
+                              ).length}
                           </span>
                         </AccordionItemButton>
                       </AccordionItemHeading>
@@ -884,12 +931,21 @@ const Friends = () => {
                             </div>
 
                             <div className="w-[90px] justify-between top-[5px] right-[-95px] absolute flex">
-                              <button
-                                onClick={() => groupDel(item)}
-                                className="cursor-pointer px-[2px] bg-[#0E6795] text-white font-bar text-[12px] font-semibold rounded-[4px]"
-                              >
-                                Delete
-                              </button>
+                              {butMem ? (
+                                <button
+                                  onClick={"() => joinGroup(item)"}
+                                  className="cursor-pointer px-[2px] bg-[#0E6795] text-white font-bar text-[12px] font-semibold rounded-[4px]"
+                                >
+                                  Joined
+                                </button>
+                              ) : (
+                                <button
+                                  onClick={() => joinGroup(item)}
+                                  className="cursor-pointer px-[2px] bg-[#0E6795] text-white font-bar text-[12px] font-semibold rounded-[4px]"
+                                >
+                                  Join
+                                </button>
+                              )}
                             </div>
                           </div>
                         ))}
