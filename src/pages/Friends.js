@@ -323,6 +323,13 @@ const Friends = () => {
 
     remove(ref(db, "userGroup/" + item.gpUid));
   };
+
+  let memGroupDel = (item) => {
+    console.log(item);
+
+    remove(ref(db, "groupMem/" + item.gmId));
+  };
+
   //################ Group  del  end ###########
 
   //################ All Group start ###########
@@ -356,15 +363,15 @@ const Friends = () => {
       createrId: item.createrId,
       createrName: item.createrName,
       createrURL: item.createrURL,
-      gpURL: item.gpURL,
+      gpURL: item.gpURL ? item.gpURL : "picNy",
       gMemberId: reduxReturnData.userStoreData.userInfo.uid,
       gMemberName: reduxReturnData.userStoreData.userInfo.displayName,
       gMemberURL: reduxReturnData.userStoreData.userInfo.photoURL,
     }).then(() => {});
-    setButMem(item.allgUid);
   };
 
   //#######Join arr start ####
+
   let [member, setMem] = useState([]);
 
   useEffect(() => {
@@ -382,12 +389,103 @@ const Friends = () => {
     });
   }, []);
   console.log(member);
+
+  let [mmber, setMm] = useState([]);
+
+  useEffect(() => {
+    const useRef = ref(db, "groupMem/");
+    onValue(useRef, (snapshot) => {
+      let arr = [];
+      snapshot.forEach((item) => {
+        arr.push({ ...item.val(), gmId: item.key });
+      });
+      setMm(arr);
+    });
+  }, []);
+  console.log(mmber);
+
   //#######Join arr end ####
   //#######Join ButtonArr start####
-  let [butMem, setButMem] = useState(false);
+  let [butmem, setBuMem] = useState([]);
 
+  useEffect(() => {
+    const useRef = ref(db, "groupMem/");
+    onValue(useRef, (snapshot) => {
+      let arr = [];
+      snapshot.forEach((item) => {
+        arr.push(item.val().gpId + item.val().gMemberId);
+      });
+      setBuMem(arr);
+    });
+  }, []);
+  console.log(butmem);
   //#######Join ButtonArr end ####
   //################ Join Group  end ###########
+  //######### my Member show start ########################
+  let [memShow, setMemShow] = useState("");
+  let [gmem, setGMem] = useState([]);
+
+  let memberHandele = (item) => {
+    console.log(item);
+    setMemShow(item.gpUid);
+    let arr = [];
+    groupShow.forEach((item) => {
+      mmber.forEach((itm) => {
+        console.log(item.gpUid, itm.gpId);
+        if (item.gpUid === itm.gpId) {
+          arr.push({ ...itm });
+        }
+      });
+    });
+    setGMem(arr);
+  };
+  console.log(gmem);
+  let modClose = (item) => {
+    setMemShow("lll");
+  };
+
+  //############### Joined Group Memeber start ###
+  let [joinedMem, setjoinedMem] = useState([]);
+
+  useEffect(() => {
+    const useRef = ref(db, "userGroup");
+    onValue(useRef, (snapshot) => {
+      let arr = [];
+      snapshot.forEach((item) => {
+        arr.push({ ...item.val(), gpUid: item.key });
+      });
+
+      setjoinedMem(arr);
+    });
+  }, []);
+  console.log(joinedMem);
+  //####### arr Joined ###
+  let [gmm, setGMm] = useState([]);
+
+  let memberHandel = (item) => {
+    console.log(item);
+    setMemShow(item.gpUid);
+    let arr = [];
+
+    mmber.forEach((itm) => {
+      console.log(item.gpId, itm.gpId);
+      if (item.gpId === itm.gpId) {
+        arr.push({ ...itm });
+      }
+    });
+
+    setGMm(arr);
+  };
+  console.log(gmm);
+  //############### Joined Group Memeber end ###
+
+  //######### Member show end ########################
+  //############# mem delete fun start###
+  let deleteMem = (item) => {
+    console.log(item.gmId);
+    remove(ref(db, "groupMem/" + item.gmId));
+  };
+  //############# mem delete fun end ###
 
   return (
     <>
@@ -868,8 +966,14 @@ const Friends = () => {
                                 @ {item.gpAbout}
                               </p>
                             </div>
-
                             <div className="w-[90px] justify-between top-[5px] right-[-95px] absolute flex">
+                              <button
+                                onClick={() => memberHandele(item)}
+                                className="cursor-pointer px-[2px] bg-[#0E6795] text-white font-bar text-[12px] font-semibold rounded-[4px]"
+                              >
+                                Member
+                              </button>
+
                               <button
                                 onClick={() => groupDel(item)}
                                 className="cursor-pointer px-[2px] bg-[#0E6795] text-white font-bar text-[12px] font-semibold rounded-[4px]"
@@ -877,6 +981,170 @@ const Friends = () => {
                                 Delete
                               </button>
                             </div>
+                            {memShow === item.gpUid && (
+                              <>
+                                <div className="justify-center border-4 rounded-lg border-solid border-[#0E6795] items-center flex overflow-x-hidden fixed inset-0 z-50 outline-none focus:outline-none">
+                                  <div className="relative w-auto my-6 mx-auto max-w-3xl">
+                                    {/*content*/}
+                                    <div className="border-2 rounded-lg border-[#0E6795] shadow-xl dark:text-white relative flex flex-col w-[280px] h-[300px] bg-white outline-none focus:outline-none">
+                                      {/*header*/}
+
+                                      {/*body*/}
+                                      <div
+                                        className="relative p-6 dark:bg-gray-700 flex-auto overflow-y-scroll scrollbar-red-500 "
+                                        style={{
+                                          scrollBehavior: "smooth",
+                                          scrollbarColor: "green",
+                                        }}
+                                      >
+                                        {gmem.map((tem) => (
+                                          <div className="mb-3 border-b pb-[6px] w-[200px] border-black ">
+                                            <div className="flex w-full gap-x-2 ">
+                                              {tem.gMemberURL ? (
+                                                <image>
+                                                  <Image
+                                                    className="w-[42px] h-[42px] rounded-full"
+                                                    imgSrc={tem.gMemberURL}
+                                                  />
+                                                </image>
+                                              ) : (
+                                                <image>
+                                                  <Image
+                                                    className="w-[42px] h-[42px] rounded-full"
+                                                    imgSrc="assets/wx1.png"
+                                                  />
+                                                </image>
+                                              )}
+                                              <div className="ml-1 w-[100px]">
+                                                <h4 className="font-bar font-bold text-[12px]">
+                                                  {tem.gMemberName}
+                                                </h4>
+                                              </div>
+
+                                              <p
+                                                onClick={(e) => deleteMem(tem)}
+                                                className="cursor-pointer font-bar font-bold text-[16px] text-red-600 "
+                                              >
+                                                X
+                                              </p>
+                                            </div>
+                                          </div>
+                                        ))}
+                                      </div>
+                                      {/*footer*/}
+                                      <div
+                                        onClick={() => modClose(item)}
+                                        className="flex items-center justify-end p-2 border-t bg-slate-500 border-solid border-slate-200 rounded-b"
+                                      ></div>
+                                    </div>
+                                  </div>
+                                </div>
+                                <div className="opacity-25 fixed inset-0 z-40 bg-black"></div>
+                              </>
+                            )}
+                          </div>
+                        ))}
+
+                        {member.map((item) => (
+                          <div
+                            key={item.gpId}
+                            className="mb-3 flex  border-b pb-1 w-[160px] border-black relative "
+                          >
+                            <div className="w-[40px] flex relative gap-x-1">
+                              <div>
+                                <image className="absolute z-0 bottom-0 left-[18px]">
+                                  <Image
+                                    className="w-[20px] h-[20px] border-[1px] border-orange-600   rounded-full"
+                                    imgSrc={item.gpURL}
+                                  />
+                                </image>
+
+                                <image className="">
+                                  <Image
+                                    className="w-[35px] h-[35px] border-[1px] border-orange-600  rounded-full"
+                                    imgSrc={item.createrURL}
+                                  />
+                                </image>
+                              </div>
+                            </div>
+                            <div className="ml-1 ">
+                              <h4 className="font-bar font-bold text-[12px]">
+                                {item.gpTitle}
+                              </h4>
+                              <p className="font-bar font-semibold text-[10px] text-[#181818]">
+                                @ {item.gpAbout}
+                              </p>
+                            </div>
+
+                            <div className="w-[90px] justify-between top-[5px] right-[-95px] absolute flex">
+                              <button
+                                onClick={() => memberHandel(item)}
+                                className="cursor-pointer px-[2px] bg-[#0E6795] text-white font-bar text-[12px] font-semibold rounded-[4px]"
+                              >
+                                Member
+                              </button>
+
+                              <button
+                                onClick={() => memGroupDel(item)}
+                                className="cursor-pointer px-[2px] bg-[#0E6795] text-white font-bar text-[12px] font-semibold rounded-[4px]"
+                              >
+                                Delete
+                              </button>
+                            </div>
+                            {memShow === item.gpUid && (
+                              <>
+                                <div className="justify-center border-4 rounded-lg border-solid border-[#0E6795] items-center flex overflow-x-hidden fixed inset-0 z-50 outline-none focus:outline-none">
+                                  <div className="relative w-auto my-6 mx-auto max-w-3xl">
+                                    {/*content*/}
+                                    <div className="border-2 rounded-lg border-[#0E6795] shadow-xl dark:text-white relative flex flex-col w-[280px] h-[300px] bg-white outline-none focus:outline-none">
+                                      {/*header*/}
+
+                                      {/*body*/}
+                                      <div
+                                        className="relative p-6 dark:bg-gray-700 flex-auto overflow-y-scroll scrollbar-red-500 "
+                                        style={{
+                                          scrollBehavior: "smooth",
+                                          scrollbarColor: "green",
+                                        }}
+                                      >
+                                        {gmm.map((tem) => (
+                                          <div className="mb-3 border-b pb-[6px] w-[200px] border-black ">
+                                            <div className="flex w-full gap-x-2 ">
+                                              {tem.gMemberURL ? (
+                                                <image>
+                                                  <Image
+                                                    className="w-[42px] h-[42px] rounded-full"
+                                                    imgSrc={tem.gMemberURL}
+                                                  />
+                                                </image>
+                                              ) : (
+                                                <image>
+                                                  <Image
+                                                    className="w-[42px] h-[42px] rounded-full"
+                                                    imgSrc="assets/wx1.png"
+                                                  />
+                                                </image>
+                                              )}
+                                              <div className="ml-1 w-[100px]">
+                                                <h4 className="font-bar font-bold text-[12px]">
+                                                  {tem.gMemberName}
+                                                </h4>
+                                              </div>
+                                            </div>
+                                          </div>
+                                        ))}
+                                      </div>
+                                      {/*footer*/}
+                                      <div
+                                        onClick={() => modClose(item)}
+                                        className="flex items-center justify-end p-2 border-t bg-slate-500 border-solid border-slate-200 rounded-b"
+                                      ></div>
+                                    </div>
+                                  </div>
+                                </div>
+                                <div className="opacity-25 fixed inset-0 z-40 bg-black"></div>
+                              </>
+                            )}
                           </div>
                         ))}
                       </AccordionItemPanel>
@@ -931,7 +1199,10 @@ const Friends = () => {
                             </div>
 
                             <div className="w-[90px] justify-between top-[5px] right-[-95px] absolute flex">
-                              {butMem ? (
+                              {butmem.includes(
+                                item.allgUid +
+                                  reduxReturnData.userStoreData.userInfo.uid
+                              ) ? (
                                 <button
                                   onClick={"() => joinGroup(item)"}
                                   className="cursor-pointer px-[2px] bg-[#0E6795] text-white font-bar text-[12px] font-semibold rounded-[4px]"

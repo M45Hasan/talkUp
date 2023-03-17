@@ -232,7 +232,8 @@ const Feed = () => {
     console.log(item.uid);
     let arr = [];
 
-    likeCount.forEach((likeCow) => {
+    likeCount.forEach((likeCow) => 
+    {
       showUser.forEach((usShow) => {
         if (likeCow.likerId === usShow.uid && item.uid === likeCow.postId) {
           arr.push({
