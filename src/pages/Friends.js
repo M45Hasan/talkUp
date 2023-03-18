@@ -356,6 +356,7 @@ const Friends = () => {
 
   let joinGroup = (item) => {
     console.log(item.gpURL);
+
     set(push(ref(db, "groupMem/")), {
       gpTitle: item.gpTitle,
       gpAbout: item.gpAbout,
@@ -401,7 +402,7 @@ const Friends = () => {
       });
       setMm(arr);
     });
-  }, []);
+  }, [db]);
   console.log(mmber);
 
   //#######Join arr end ####
@@ -429,13 +430,10 @@ const Friends = () => {
     console.log(item);
     setMemShow(item.gpUid);
     let arr = [];
-    groupShow.forEach((item) => {
-      mmber.forEach((itm) => {
-        console.log(item.gpUid, itm.gpId);
-        if (item.gpUid === itm.gpId) {
-          arr.push({ ...itm });
-        }
-      });
+    mmber.forEach((itm) => {
+      if (item.gpUid === itm.gpId) {
+        arr.push({ ...itm });
+      }
     });
     setGMem(arr);
   };
@@ -481,10 +479,12 @@ const Friends = () => {
 
   //######### Member show end ########################
   //############# mem delete fun start###
+
   let deleteMem = (item) => {
     console.log(item.gmId);
     remove(ref(db, "groupMem/" + item.gmId));
   };
+
   //############# mem delete fun end ###
 
   return (
@@ -966,6 +966,7 @@ const Friends = () => {
                                 @ {item.gpAbout}
                               </p>
                             </div>
+
                             <div className="w-[90px] justify-between top-[5px] right-[-95px] absolute flex">
                               <button
                                 onClick={() => memberHandele(item)}
@@ -997,7 +998,7 @@ const Friends = () => {
                                           scrollbarColor: "green",
                                         }}
                                       >
-                                        {gmem.map((tem) => (
+                                        {gmem?.map((tem) => (
                                           <div className="mb-3 border-b pb-[6px] w-[200px] border-black ">
                                             <div className="flex w-full gap-x-2 ">
                                               {tem.gMemberURL ? (
@@ -1034,8 +1035,12 @@ const Friends = () => {
                                       {/*footer*/}
                                       <div
                                         onClick={() => modClose(item)}
-                                        className="flex items-center justify-end p-2 border-t bg-slate-500 border-solid border-slate-200 rounded-b"
-                                      ></div>
+                                        className="flex cursor-pointer items-center justify-end pr-4 border-t bg-slate-500 border-solid border-slate-200 rounded-b"
+                                      >
+                                        <p className=" font-bar font-bold text-[16px] text-red-600 ">
+                                          X
+                                        </p>{" "}
+                                      </div>
                                     </div>
                                   </div>
                                 </div>
@@ -1137,8 +1142,12 @@ const Friends = () => {
                                       {/*footer*/}
                                       <div
                                         onClick={() => modClose(item)}
-                                        className="flex items-center justify-end p-2 border-t bg-slate-500 border-solid border-slate-200 rounded-b"
-                                      ></div>
+                                        className="flex cursor-pointer items-center justify-end pr-4 border-t bg-slate-500 border-solid border-slate-200 rounded-b"
+                                      >
+                                        <p className=" font-bar font-bold text-[16px] text-red-600 ">
+                                          X
+                                        </p>{" "}
+                                      </div>
                                     </div>
                                   </div>
                                 </div>
