@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from "react";
 import Container from "../component/Container";
 
 import { FiSend } from "react-icons/fi";
-import { MdOutlineAddPhotoAlternate } from "react-icons/md";
+
 import { ImCross } from "react-icons/im";
 import { useNavigate } from "react-router-dom";
 import {
@@ -11,8 +11,10 @@ import {
   AiFillDislike,
   AiFillCamera,
 } from "react-icons/ai";
-import { BsFillEmojiSunglassesFill } from "react-icons/bs";
+import { MdOutlineAddPhotoAlternate } from "react-icons/md";
 import { HiMicrophone } from "react-icons/hi";
+
+import { BsFillEmojiSunglassesFill } from "react-icons/bs";
 
 import {
   getDatabase,
@@ -910,6 +912,7 @@ const Feed = () => {
                             </div>
                           </div>
                         )}
+                        
                         {micShow === item.uid && (
                           <div className="bg-gradient-to-r from-sky-400 via-cyan-900 to-indigo-500 flex gap-x-16 h-[28px] mt-[1px] right-[0px] top-10 border-[1px] border-pink-500  rounded-md absolute w-full">
                             {recordedAudio ? (
