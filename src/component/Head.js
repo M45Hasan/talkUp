@@ -28,6 +28,7 @@ import EmojiPicker from "emoji-picker-react";
 import { AiFillCamera } from "react-icons/ai";
 import { MdOutlineAddPhotoAlternate } from "react-icons/md";
 import { HiMicrophone } from "react-icons/hi";
+import { FaShare } from "react-icons/fa";
 import Webcam from "react-webcam";
 //############################### web Cam start ########
 const WebcamComponent = () => <Webcam />;
@@ -341,6 +342,41 @@ const Head = () => {
   };
   //############################### voice end ########
   //############### friends message end ##########
+  //######
+  //############### share message start ##########
+  let [shareFnd, setShareFnd] = useState("");
+  let [shareArr, setShare] = useState([]);
+  let shareFn = (it) => {
+    setShareFnd(it.messUid);
+    console.log(it);
+    let arr = [];
+    fndShow.forEach((item) => {
+      if (it.fndUid === item.fndUid) {
+        arr.push(it);
+      }
+    });
+    setShare(arr);
+  };
+  console.log(shareArr);
+
+  let sendShare = (item) => {
+    console.log(item);
+    shareArr.forEach((it) => {
+      console.log(it);
+      set(push(ref(db, "fndMess/")), {
+        mesg: it.mesg,
+        fndUid: item.fndUid,
+        messCamURL: it.messCamURL ? it.messCamURL : "",
+        mSenderId: it.mSenderId,
+        mSenderName: it.mSenderName,
+        mSenderURL: it.mSenderURL,
+        messURL: it.messURL ? it.messURL : "",
+        messVoice: it.messVoice ? it.messVoice : "",
+      });
+    });
+  };
+
+  //############### share message end ##########
 
   return (
     <>
@@ -450,115 +486,199 @@ const Head = () => {
                               <>
                                 <div className=" w-[319px] h-[150px] overflow-y-scroll overscroll-y-none my-4">
                                   {messArr.map((it) => (
-                                    <div className="w-full  shadow-lg  my-2 ">
-                                      {reduxReturnData.userStoreData.userInfo
-                                        .uid === it.mSenderId &&
-                                        item.fndUid === it.fndUid && (
-                                          <div className="w-[70%] bg-cyan-300 translate-x-[40%] rounded-lg shadow-lg p-2  relative hover:border-[1px]  hover:border-orange-700 ease-in duration-100">
-                                            <button
-                                              onClick={() => comDel(it)}
-                                              className="text-bar self-baseline absolute top-2 right-2 font-sm text-sm  text-[#0275B1] hover:text-red-500 cursor-pointer "
-                                            >
-                                              x
-                                            </button>
-                                            <div className="flex justify-between items-center w-[150px] mb-[8px]">
-                                              <image className="shadow-lg ">
-                                                <Image
-                                                  className="w-[35px] h-[35px] rounded-[4px] border-2 border-solid border-cyan-400"
-                                                  imgSrc={it.mSenderURL}
-                                                />
-                                              </image>
+                                    <>
+                                      <div className="w-full  shadow-lg  my-2 ">
+                                        {reduxReturnData.userStoreData.userInfo
+                                          .uid === it.mSenderId &&
+                                          item.fndUid === it.fndUid && (
+                                            <div className="w-[70%] bg-cyan-300 translate-x-[40%] rounded-lg shadow-lg p-2  relative hover:border-[1px]  hover:border-orange-700 ease-in duration-100">
+                                              <button
+                                                onClick={() => comDel(it)}
+                                                className="text-bar self-baseline absolute top-1 right-2 font-sm text-sm  text-[#0275B1] hover:text-red-500 cursor-pointer "
+                                              >
+                                                x
+                                              </button>
+                                              <FaShare
+                                                onClick={() => shareFn(it)}
+                                                className="text-bar self-baseline absolute top-8 right-1  text-sm  text-[#0275B1] hover:text-green-500 cursor-pointer "
+                                              />
+                                              <div className="flex justify-between items-center w-[150px] mb-[8px]">
+                                                <image className="shadow-lg ">
+                                                  <Image
+                                                    className="w-[35px] h-[35px] rounded-[4px] border-2 border-solid border-cyan-400"
+                                                    imgSrc={it.mSenderURL}
+                                                  />
+                                                </image>
 
-                                              <div className="w-[100px]">
-                                                <h4 className="font-bar font-bold mt-[-15px] text-[12px]">
-                                                  {it.mSenderName}
-                                                </h4>
+                                                <div className="w-[100px]">
+                                                  <h4 className="font-bar font-bold mt-[-15px] text-[12px]">
+                                                    {it.mSenderName}
+                                                  </h4>
+                                                </div>
+                                              </div>
+                                              <div className="pr-1 w-[200px] overflow-x-hidden">
+                                                <p className="text-gray-700 text-sm font-semibold font-bar ">
+                                                  {it.mesg}
+                                                </p>
+                                              </div>
+                                              {it.messURL && (
+                                                <image className="w-[120px] h-[80px] mt-1">
+                                                  <Image
+                                                    className="w-full h-[80px] cover border-2 border-orange-600 rounded-[5px]"
+                                                    imgSrc={it.messURL}
+                                                  />
+                                                </image>
+                                              )}
+
+                                              {it.messCamURL && (
+                                                <image className="w-[120px] h-[80px] mt-1">
+                                                  <Image
+                                                    className="w-full h-[80px] cover border-2 border-orange-600 shadow-lg rounded-[5px]"
+                                                    imgSrc={it.messCamURL}
+                                                  />
+                                                </image>
+                                              )}
+                                              {it.messVoice && (
+                                                <audio
+                                                  className="h-[28px]  w-[190px]"
+                                                  src={it.messVoice}
+                                                  type="audio/ogg; codecs=opus"
+                                                  controls
+                                                />
+                                              )}
+                                            </div>
+                                          )}
+
+                                        {reduxReturnData.userStoreData.userInfo
+                                          .uid !== it.mSenderId &&
+                                          item.fndUid === it.fndUid && (
+                                            <div className="w-[70%] bg-gray-300 rounded-lg shadow-lg p-2  relative hover:border-[1px]  hover:border-orange-700 ease-in duration-100">
+                                              <FaShare
+                                                onClick={() => shareFn(it)}
+                                                className="text-bar self-baseline absolute top-2 right-1  text-sm  text-[#0275B1] hover:text-green-500 cursor-pointer "
+                                              />
+
+                                              <div className="flex gap-x-1 items-center w-[150px] mb-[8px]">
+                                                <image className="shadow-lg ">
+                                                  <Image
+                                                    className="w-[35px] h-[35px] rounded-[4px] border-2 border-solid border-cyan-400"
+                                                    imgSrc={it.mSenderURL}
+                                                  />
+                                                </image>
+
+                                                <div className="w-[100px]">
+                                                  <h4 className="font-bar font-bold mt-[-10px] text-[12px]">
+                                                    {it.mSenderName}
+                                                  </h4>
+                                                </div>
+                                              </div>
+                                              <div className="pr-1 w-[200px] overflow-x-hidden">
+                                                <p className="text-gray-700 text-sm font-semibold font-bar ">
+                                                  {it.mesg}
+                                                </p>
+                                              </div>
+                                              {it.messURL && (
+                                                <image className="w-[120px] h-[80px] mt-1">
+                                                  <Image
+                                                    className="w-full h-[80px] cover border-2 border-orange-600 rounded-[5px]"
+                                                    imgSrc={it.messURL}
+                                                  />
+                                                </image>
+                                              )}
+
+                                              {it.messCamURL && (
+                                                <image className="w-[120px] h-[80px] mt-1">
+                                                  <Image
+                                                    className="w-full h-[80px] cover border-2 border-orange-600 shadow-lg rounded-[5px]"
+                                                    imgSrc={it.messCamURL}
+                                                  />
+                                                </image>
+                                              )}
+                                              {it.messVoice && (
+                                                <audio
+                                                  className="h-[28px] w-[190px]"
+                                                  src={it.messVoice}
+                                                  type="audio/ogg; codecs=opus"
+                                                  controls
+                                                />
+                                              )}
+                                            </div>
+                                          )}
+                                      </div>
+                                      {shareFnd === it.messUid && (
+                                        <>
+                                          <div className="justify-center border-4 rounded-lg border-solid border-[#0E6795] items-center flex overflow-x-hidden fixed inset-0 z-50 outline-none focus:outline-none">
+                                            <div className="relative w-auto my-6 mx-auto max-w-3xl">
+                                              {/*content*/}
+                                              <div className="border-2 rounded-lg border-[#0E6795] shadow-xl dark:text-white relative flex flex-col w-[280px] h-[300px] bg-white outline-none focus:outline-none">
+                                                {/*header*/}
+
+                                                {/*body*/}
+                                                <div
+                                                  className="relative p-6 dark:bg-gray-700 flex-auto overflow-y-scroll scrollbar-red-500 "
+                                                  style={{
+                                                    scrollBehavior: "smooth",
+                                                    scrollbarColor: "green",
+                                                  }}
+                                                >
+                                               
+                                                    <div className="mb-3 border-b pb-[6px] w-[200px] border-black relative ">
+                                                      <div className="flex w-full gap-x-2 ">
+                                                        {item.fndAcptURL ? (
+                                                          <image>
+                                                            <Image
+                                                              className="w-[42px] h-[42px] rounded-full"
+                                                              imgSrc={
+                                                                item.fndAcptURL
+                                                              }
+                                                            />
+                                                          </image>
+                                                        ) : (
+                                                          <image>
+                                                            <Image
+                                                              className="w-[42px] h-[42px] rounded-full"
+                                                              imgSrc="assets/wx1.png"
+                                                            />
+                                                          </image>
+                                                        )}
+                                                        <div className="ml-1 w-[100px]">
+                                                          <h4 className="font-bar font-bold text-[12px]">
+                                                            {item.fndAcptName}
+                                                          </h4>
+                                                          <p className="font-bar font-semibold text-[10px] text-[#181818] dark:text-white">
+                                                            @ {item.fndAcptABout}
+                                                          </p>
+                                                        </div>
+                                                      </div>
+                                                      <button
+                                                        onClick={() =>
+                                                          sendShare(item)
+                                                        }
+                                                        className="absolute px-[3px] font-bar text-[10px] bg-slate-50 rounded-md right-0 top-2 font-semibold text-[#0E6795]"
+                                                      >
+                                                        Send
+                                                      </button>
+                                                    </div>
+                                                 
+                                                </div>
+                                                {/*footer*/}
+                                                <div
+                                                  onClick={() =>
+                                                    setShareFnd("kkk")
+                                                  }
+                                                  className="flex items-center cursor-pointer justify-end p-2 border-t bg-slate-500 border-solid border-slate-200 rounded-b"
+                                                >
+                                                  <p className="font-bar font-semibold text-[10px] text-[#181818] dark:text-white">
+                                                    Cancel
+                                                  </p>
+                                                </div>
                                               </div>
                                             </div>
-                                            <div className="pr-1 w-[200px] overflow-x-hidden">
-                                              <p className="text-gray-700 text-sm font-semibold font-bar ">
-                                                {it.mesg}
-                                              </p>
-                                            </div>
-                                            {it.messURL && (
-                                              <image className="w-[120px] h-[80px] mt-1">
-                                                <Image
-                                                  className="w-full h-[80px] cover border-2 border-orange-600 rounded-[5px]"
-                                                  imgSrc={it.messURL}
-                                                />
-                                              </image>
-                                            )}
-
-                                            {it.messCamURL && (
-                                              <image className="w-[120px] h-[80px] mt-1">
-                                                <Image
-                                                  className="w-full h-[80px] cover border-2 border-orange-600 shadow-lg rounded-[5px]"
-                                                  imgSrc={it.messCamURL}
-                                                />
-                                              </image>
-                                            )}
-                                            {it.messVoice && (
-                                              <audio
-                                                className="h-[28px]  w-[190px]"
-                                                src={it.messVoice}
-                                                type="audio/ogg; codecs=opus"
-                                                controls
-                                              />
-                                            )}
                                           </div>
-                                        )}
-
-                                      {reduxReturnData.userStoreData.userInfo
-                                        .uid !== it.mSenderId &&
-                                        item.fndUid === it.fndUid && (
-                                          <div className="w-[70%] bg-gray-300 rounded-lg shadow-lg p-2  relative hover:border-[1px]  hover:border-orange-700 ease-in duration-100">
-                                            <div className="flex gap-x-1 items-center w-[150px] mb-[8px]">
-                                              <image className="shadow-lg ">
-                                                <Image
-                                                  className="w-[35px] h-[35px] rounded-[4px] border-2 border-solid border-cyan-400"
-                                                  imgSrc={it.mSenderURL}
-                                                />
-                                              </image>
-
-                                              <div className="w-[100px]">
-                                                <h4 className="font-bar font-bold mt-[-10px] text-[12px]">
-                                                  {it.mSenderName}
-                                                </h4>
-                                              </div>
-                                            </div>
-                                            <div className="pr-1 w-[200px] overflow-x-hidden">
-                                              <p className="text-gray-700 text-sm font-semibold font-bar ">
-                                                {it.mesg}
-                                              </p>
-                                            </div>
-                                            {it.messURL && (
-                                              <image className="w-[120px] h-[80px] mt-1">
-                                                <Image
-                                                  className="w-full h-[80px] cover border-2 border-orange-600 rounded-[5px]"
-                                                  imgSrc={it.messURL}
-                                                />
-                                              </image>
-                                            )}
-
-                                            {it.messCamURL && (
-                                              <image className="w-[120px] h-[80px] mt-1">
-                                                <Image
-                                                  className="w-full h-[80px] cover border-2 border-orange-600 shadow-lg rounded-[5px]"
-                                                  imgSrc={it.messCamURL}
-                                                />
-                                              </image>
-                                            )}
-                                            {it.messVoice && (
-                                              <audio
-                                                className="h-[28px] w-[190px]"
-                                                src={it.messVoice}
-                                                type="audio/ogg; codecs=opus"
-                                                controls
-                                              />
-                                            )}
-                                          </div>
-                                        )}
-                                    </div>
+                                          <div className="opacity-25 fixed inset-0 z-40 bg-black"></div>
+                                        </>
+                                      )}
+                                    </>
                                   ))}
 
                                   <div className="w-full h-6  flex justify-between bg-gray-300 shadow-lg rounded-sm hover:border-orange-800 mt-[10px] relative">
@@ -783,115 +903,199 @@ const Head = () => {
                               <>
                                 <div className=" w-[319px] h-[150px] overflow-y-scroll overscroll-y-none my-4">
                                   {messArr.map((it) => (
-                                    <div className="w-full  shadow-lg  my-2 ">
-                                      {reduxReturnData.userStoreData.userInfo
-                                        .uid === it.mSenderId &&
-                                        item.fndUid === it.fndUid && (
-                                          <div className="w-[70%] bg-cyan-200 translate-x-[40%] rounded-lg shadow-lg p-2  relative hover:border-[1px]  hover:border-orange-700 ease-in duration-100">
-                                            <button
-                                              onClick={() => comDel(it)}
-                                              className="text-bar self-baseline absolute top-2 right-2 font-sm text-sm  text-[#0275B1] hover:text-red-500 cursor-pointer "
-                                            >
-                                              x
-                                            </button>
-                                            <div className="flex justify-between items-center w-[150px] mb-[8px]">
-                                              <image className="shadow-lg ">
-                                                <Image
-                                                  className="w-[35px] h-[35px] rounded-[4px] border-2 border-solid border-cyan-400"
-                                                  imgSrc={it.mSenderURL}
-                                                />
-                                              </image>
+                                    <>
+                                      <div className="w-full  shadow-lg  my-2 ">
+                                        {reduxReturnData.userStoreData.userInfo
+                                          .uid === it.mSenderId &&
+                                          item.fndUid === it.fndUid && (
+                                            <div className="w-[70%] bg-cyan-200 translate-x-[40%] rounded-lg shadow-lg p-2  relative hover:border-[1px]  hover:border-orange-700 ease-in duration-100">
+                                              <button
+                                                onClick={() => comDel(it)}
+                                                className="text-bar self-baseline absolute top-1 right-2 font-sm text-sm  text-[#0275B1] hover:text-red-500 cursor-pointer "
+                                              >
+                                                x
+                                              </button>
+                                              <FaShare
+                                                onClick={() => shareFn(it)}
+                                                className="text-bar self-baseline absolute top-8 right-1  text-sm  text-[#0275B1] hover:text-green-500 cursor-pointer "
+                                              />
+                                              <div className="flex justify-between items-center w-[150px] mb-[8px]">
+                                                <image className="shadow-lg ">
+                                                  <Image
+                                                    className="w-[35px] h-[35px] rounded-[4px] border-2 border-solid border-cyan-400"
+                                                    imgSrc={it.mSenderURL}
+                                                  />
+                                                </image>
 
-                                              <div className="w-[100px]">
-                                                <h4 className="font-bar font-bold mt-[-15px] text-[12px]">
-                                                  {it.mSenderName}
-                                                </h4>
+                                                <div className="w-[100px]">
+                                                  <h4 className="font-bar font-bold mt-[-15px] text-[12px]">
+                                                    {it.mSenderName}
+                                                  </h4>
+                                                </div>
+                                              </div>
+                                              <div className="pr-1 w-[200px] overflow-x-hidden">
+                                                <p className="text-gray-700 text-sm font-semibold font-bar ">
+                                                  {it.mesg}
+                                                </p>
+                                              </div>
+                                              {it.messURL && (
+                                                <image className="w-[120px] h-[80px] mt-[5px]">
+                                                  <Image
+                                                    className="w-full h-[80px] cover border-2 border-orange-600 rounded-[5px]"
+                                                    imgSrc={it.messURL}
+                                                  />
+                                                </image>
+                                              )}
+
+                                              {it.messCamURL && (
+                                                <image className="w-[120px] h-[80px] mt-1">
+                                                  <Image
+                                                    className="w-full h-[80px] cover border-2 border-orange-600 shadow-lg rounded-[5px]"
+                                                    imgSrc={it.messCamURL}
+                                                  />
+                                                </image>
+                                              )}
+                                              {it.messVoice && (
+                                                <audio
+                                                  className="h-[20px] w-[180px]"
+                                                  src={it.messVoice}
+                                                  type="audio/ogg; codecs=opus"
+                                                  controls
+                                                />
+                                              )}
+                                            </div>
+                                          )}
+
+                                        {reduxReturnData.userStoreData.userInfo
+                                          .uid !== it.mSenderId &&
+                                          item.fndUid === it.fndUid && (
+                                            <div className="w-[70%] bg-gray-300 rounded-lg shadow-lg p-2  relative hover:border-[1px]  hover:border-orange-700 ease-in duration-100">
+                                              <FaShare
+                                                onClick={() => shareFn(it)}
+                                                className="text-bar self-baseline absolute top-2 right-1  text-sm  text-[#0275B1] hover:text-green-500 cursor-pointer "
+                                              />
+                                              <div className="flex gap-x-1 items-center w-[150px] mb-[8px]">
+                                                <image className="shadow-lg ">
+                                                  <Image
+                                                    className="w-[35px] h-[35px] rounded-[4px] border-2 border-solid border-cyan-400"
+                                                    imgSrc={it.mSenderURL}
+                                                  />
+                                                </image>
+
+                                                <div className="w-[100px]">
+                                                  <h4 className="font-bar font-bold mt-[-15px] text-[12px]">
+                                                    {it.mSenderName}
+                                                  </h4>
+                                                </div>
+                                              </div>
+                                              <div className="pr-1 w-[200px] overflow-x-hidden">
+                                                <p className="text-gray-700 text-sm font-semibold font-bar">
+                                                  {it.mesg}
+                                                </p>
+                                              </div>
+                                              {it.messURL && (
+                                                <image className="w-[120px] h-[80px] mt-[5px]">
+                                                  <Image
+                                                    className="w-full h-[80px] cover border-2 border-orange-600 rounded-[5px]"
+                                                    imgSrc={it.messURL}
+                                                  />
+                                                </image>
+                                              )}
+
+                                              {it.messCamURL && (
+                                                <image className="w-[120px] h-[80px] mt-1">
+                                                  <Image
+                                                    className="w-full h-[80px] cover border-2 border-orange-600 shadow-lg rounded-[5px]"
+                                                    imgSrc={it.messCamURL}
+                                                  />
+                                                </image>
+                                              )}
+                                              {it.messVoice && (
+                                                <audio
+                                                  className="h-[20px] w-[180px]"
+                                                  src={it.messVoice}
+                                                  type="audio/ogg; codecs=opus"
+                                                  controls
+                                                />
+                                              )}
+                                            </div>
+                                          )}
+                                      </div>
+
+                                      {shareFnd === it.messUid && (
+                                        <>
+                                          <div className="justify-center border-4 rounded-lg border-solid border-[#0E6795] items-center flex overflow-x-hidden fixed inset-0 z-50 outline-none focus:outline-none">
+                                            <div className="relative w-auto my-6 mx-auto max-w-3xl">
+                                              {/*content*/}
+                                              <div className="border-2 rounded-lg border-[#0E6795] shadow-xl dark:text-white relative flex flex-col w-[280px] h-[300px] bg-white outline-none focus:outline-none">
+                                                {/*header*/}
+
+                                                {/*body*/}
+                                                <div
+                                                  className="relative p-6 dark:bg-gray-700 flex-auto overflow-y-scroll scrollbar-red-500 "
+                                                  style={{
+                                                    scrollBehavior: "smooth",
+                                                    scrollbarColor: "green",
+                                                  }}
+                                                >
+                                                  {fndShow.map((tem) => (
+                                                    <div className="mb-3 border-b pb-[6px] w-[200px] border-black relative ">
+                                                      <div className="flex w-full gap-x-2 ">
+                                                        {tem.friendURL ? (
+                                                          <image>
+                                                            <Image
+                                                              className="w-[42px] h-[42px] rounded-full"
+                                                              imgSrc={
+                                                                tem.friendURL
+                                                              }
+                                                            />
+                                                          </image>
+                                                        ) : (
+                                                          <image>
+                                                            <Image
+                                                              className="w-[42px] h-[42px] rounded-full"
+                                                              imgSrc="assets/wx1.png"
+                                                            />
+                                                          </image>
+                                                        )}
+                                                        <div className="ml-1 w-[100px]">
+                                                          <h4 className="font-bar font-bold text-[12px]">
+                                                            {tem.friendName}
+                                                          </h4>
+                                                          <p className="font-bar font-semibold text-[10px] text-[#181818] dark:text-white">
+                                                            @ {tem.friendAbout}
+                                                          </p>
+                                                        </div>
+                                                      </div>
+                                                      <button
+                                                        onClick={() =>
+                                                          sendShare(tem)
+                                                        }
+                                                        className="absolute px-[3px] font-bar text-[10px] bg-slate-50 rounded-md right-0 top-2 font-semibold text-[#0E6795]"
+                                                      >
+                                                        Send
+                                                      </button>
+                                                    </div>
+                                                  ))}
+                                                </div>
+                                                {/*footer*/}
+                                                <div
+                                                  onClick={() =>
+                                                    setShareFnd("kkk")
+                                                  }
+                                                  className="flex items-center cursor-pointer justify-end p-2 border-t bg-slate-500 border-solid border-slate-200 rounded-b"
+                                                >
+                                                  <p className="font-bar font-semibold text-[10px] text-[#181818] dark:text-white">
+                                                    Cancel
+                                                  </p>
+                                                </div>
                                               </div>
                                             </div>
-                                            <div className="pr-1 w-[200px] overflow-x-hidden">
-                                              <p className="text-gray-700 text-sm font-semibold font-bar ">
-                                                {it.mesg}
-                                              </p>
-                                            </div>
-                                            {it.messURL && (
-                                              <image className="w-[120px] h-[80px] mt-[5px]">
-                                                <Image
-                                                  className="w-full h-[80px] cover border-2 border-orange-600 rounded-[5px]"
-                                                  imgSrc={it.messURL}
-                                                />
-                                              </image>
-                                            )}
-
-                                            {it.messCamURL && (
-                                              <image className="w-[120px] h-[80px] mt-1">
-                                                <Image
-                                                  className="w-full h-[80px] cover border-2 border-orange-600 shadow-lg rounded-[5px]"
-                                                  imgSrc={it.messCamURL}
-                                                />
-                                              </image>
-                                            )}
-                                            {it.messVoice && (
-                                              <audio
-                                                className="h-[20px] w-[180px]"
-                                                src={it.messVoice}
-                                                type="audio/ogg; codecs=opus"
-                                                controls
-                                              />
-                                            )}
                                           </div>
-                                        )}
-
-                                      {reduxReturnData.userStoreData.userInfo
-                                        .uid !== it.mSenderId &&
-                                        item.fndUid === it.fndUid && (
-                                          <div className="w-[70%] bg-gray-300 rounded-lg shadow-lg p-2  relative hover:border-[1px]  hover:border-orange-700 ease-in duration-100">
-                                            <div className="flex gap-x-1 items-center w-[150px] mb-[8px]">
-                                              <image className="shadow-lg ">
-                                                <Image
-                                                  className="w-[35px] h-[35px] rounded-[4px] border-2 border-solid border-cyan-400"
-                                                  imgSrc={it.mSenderURL}
-                                                />
-                                              </image>
-
-                                              <div className="w-[100px]">
-                                                <h4 className="font-bar font-bold mt-[-15px] text-[12px]">
-                                                  {it.mSenderName}
-                                                </h4>
-                                              </div>
-                                            </div>
-                                            <div className="pr-1 w-[200px] overflow-x-hidden">
-                                              <p className="text-gray-700 text-sm font-semibold font-bar">
-                                                {it.mesg}
-                                              </p>
-                                            </div>
-                                            {it.messURL && (
-                                              <image className="w-[120px] h-[80px] mt-[5px]">
-                                                <Image
-                                                  className="w-full h-[80px] cover border-2 border-orange-600 rounded-[5px]"
-                                                  imgSrc={it.messURL}
-                                                />
-                                              </image>
-                                            )}
-
-                                            {it.messCamURL && (
-                                              <image className="w-[120px] h-[80px] mt-1">
-                                                <Image
-                                                  className="w-full h-[80px] cover border-2 border-orange-600 shadow-lg rounded-[5px]"
-                                                  imgSrc={it.messCamURL}
-                                                />
-                                              </image>
-                                            )}
-                                            {it.messVoice && (
-                                              <audio
-                                                className="h-[20px] w-[180px]"
-                                                src={it.messVoice}
-                                                type="audio/ogg; codecs=opus"
-                                                controls
-                                              />
-                                            )}
-                                          </div>
-                                        )}
-                                    </div>
+                                          <div className="opacity-25 fixed inset-0 z-40 bg-black"></div>
+                                        </>
+                                      )}
+                                    </>
                                   ))}
 
                                   <div className="w-full h-6  flex justify-between bg-gray-300 shadow-lg rounded-sm hover:border-orange-800 mt-[10px] relative">
