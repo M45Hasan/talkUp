@@ -344,37 +344,37 @@ const Head = () => {
   //############### friends message end ##########
   //######
   //############### share message start ##########
-  let [shareFnd, setShareFnd] = useState("");
-  let [shareArr, setShare] = useState([]);
-  let shareFn = (it) => {
-    setShareFnd(it.messUid);
-    console.log(it);
-    let arr = [];
-    fndShow.forEach((item) => {
-      if (it.fndUid === item.fndUid) {
-        arr.push(it);
-      }
-    });
-    setShare(arr);
-  };
-  console.log(shareArr);
+  // let [shareFnd, setShareFnd] = useState("");
+  // let [shareArr, setShare] = useState([]);
+  // let shareFn = (it) => {
+  //   setShareFnd(it.messUid);
+  //   console.log(it);
+  //   let arr = [];
+  //   fndShow.forEach((item) => {
+  //     if (it.fndUid === item.fndUid) {
+  //       arr.push(it);
+  //     }
+  //   });
+  //   setShare(arr);
+  // };
+  // console.log(shareArr);
 
-  let sendShare = (item) => {
-    console.log(item);
-    shareArr.forEach((it) => {
-      console.log(it);
-      set(push(ref(db, "fndMess/")), {
-        mesg: it.mesg,
-        fndUid: item.fndUid,
-        messCamURL: it.messCamURL ? it.messCamURL : "",
-        mSenderId: it.mSenderId,
-        mSenderName: it.mSenderName,
-        mSenderURL: it.mSenderURL,
-        messURL: it.messURL ? it.messURL : "",
-        messVoice: it.messVoice ? it.messVoice : "",
-      });
-    });
-  };
+  // let sendShare = (item) => {
+  //   console.log(item);
+  //   shareArr.forEach((it) => {
+  //     console.log(it);
+  //     set(push(ref(db, "fndMess/")), {
+  //       mesg: it.mesg,
+  //       fndUid: item.fndUid,
+  //       messCamURL: it.messCamURL ? it.messCamURL : "",
+  //       mSenderId: it.mSenderId,
+  //       mSenderName: it.mSenderName,
+  //       mSenderURL: it.mSenderURL,
+  //       messURL: it.messURL ? it.messURL : "",
+  //       messVoice: it.messVoice ? it.messVoice : "",
+  //     });
+  //   });
+  // };
 
   //############### share message end ##########
 
@@ -498,10 +498,7 @@ const Head = () => {
                                               >
                                                 x
                                               </button>
-                                              <FaShare
-                                                onClick={() => shareFn(it)}
-                                                className="text-bar self-baseline absolute top-8 right-1  text-sm  text-[#0275B1] hover:text-green-500 cursor-pointer "
-                                              />
+                                             
                                               <div className="flex justify-between items-center w-[150px] mb-[8px]">
                                                 <image className="shadow-lg ">
                                                   <Image
@@ -553,10 +550,7 @@ const Head = () => {
                                           .uid !== it.mSenderId &&
                                           item.fndUid === it.fndUid && (
                                             <div className="w-[70%] bg-gray-300 rounded-lg shadow-lg p-2  relative hover:border-[1px]  hover:border-orange-700 ease-in duration-100">
-                                              <FaShare
-                                                onClick={() => shareFn(it)}
-                                                className="text-bar self-baseline absolute top-2 right-1  text-sm  text-[#0275B1] hover:text-green-500 cursor-pointer "
-                                              />
+                                            
 
                                               <div className="flex gap-x-1 items-center w-[150px] mb-[8px]">
                                                 <image className="shadow-lg ">
@@ -605,79 +599,7 @@ const Head = () => {
                                             </div>
                                           )}
                                       </div>
-                                      {shareFnd === it.messUid && (
-                                        <>
-                                          <div className="justify-center border-4 rounded-lg border-solid border-[#0E6795] items-center flex overflow-x-hidden fixed inset-0 z-50 outline-none focus:outline-none">
-                                            <div className="relative w-auto my-6 mx-auto max-w-3xl">
-                                              {/*content*/}
-                                              <div className="border-2 rounded-lg border-[#0E6795] shadow-xl dark:text-white relative flex flex-col w-[280px] h-[300px] bg-white outline-none focus:outline-none">
-                                                {/*header*/}
 
-                                                {/*body*/}
-                                                <div
-                                                  className="relative p-6 dark:bg-gray-700 flex-auto overflow-y-scroll scrollbar-red-500 "
-                                                  style={{
-                                                    scrollBehavior: "smooth",
-                                                    scrollbarColor: "green",
-                                                  }}
-                                                >
-                                               
-                                                    <div className="mb-3 border-b pb-[6px] w-[200px] border-black relative ">
-                                                      <div className="flex w-full gap-x-2 ">
-                                                        {item.fndAcptURL ? (
-                                                          <image>
-                                                            <Image
-                                                              className="w-[42px] h-[42px] rounded-full"
-                                                              imgSrc={
-                                                                item.fndAcptURL
-                                                              }
-                                                            />
-                                                          </image>
-                                                        ) : (
-                                                          <image>
-                                                            <Image
-                                                              className="w-[42px] h-[42px] rounded-full"
-                                                              imgSrc="assets/wx1.png"
-                                                            />
-                                                          </image>
-                                                        )}
-                                                        <div className="ml-1 w-[100px]">
-                                                          <h4 className="font-bar font-bold text-[12px]">
-                                                            {item.fndAcptName}
-                                                          </h4>
-                                                          <p className="font-bar font-semibold text-[10px] text-[#181818] dark:text-white">
-                                                            @ {item.fndAcptABout}
-                                                          </p>
-                                                        </div>
-                                                      </div>
-                                                      <button
-                                                        onClick={() =>
-                                                          sendShare(item)
-                                                        }
-                                                        className="absolute px-[3px] font-bar text-[10px] bg-slate-50 rounded-md right-0 top-2 font-semibold text-[#0E6795]"
-                                                      >
-                                                        Send
-                                                      </button>
-                                                    </div>
-                                                 
-                                                </div>
-                                                {/*footer*/}
-                                                <div
-                                                  onClick={() =>
-                                                    setShareFnd("kkk")
-                                                  }
-                                                  className="flex items-center cursor-pointer justify-end p-2 border-t bg-slate-500 border-solid border-slate-200 rounded-b"
-                                                >
-                                                  <p className="font-bar font-semibold text-[10px] text-[#181818] dark:text-white">
-                                                    Cancel
-                                                  </p>
-                                                </div>
-                                              </div>
-                                            </div>
-                                          </div>
-                                          <div className="opacity-25 fixed inset-0 z-40 bg-black"></div>
-                                        </>
-                                      )}
                                     </>
                                   ))}
 
@@ -915,10 +837,7 @@ const Head = () => {
                                               >
                                                 x
                                               </button>
-                                              <FaShare
-                                                onClick={() => shareFn(it)}
-                                                className="text-bar self-baseline absolute top-8 right-1  text-sm  text-[#0275B1] hover:text-green-500 cursor-pointer "
-                                              />
+                                           
                                               <div className="flex justify-between items-center w-[150px] mb-[8px]">
                                                 <image className="shadow-lg ">
                                                   <Image
@@ -970,10 +889,7 @@ const Head = () => {
                                           .uid !== it.mSenderId &&
                                           item.fndUid === it.fndUid && (
                                             <div className="w-[70%] bg-gray-300 rounded-lg shadow-lg p-2  relative hover:border-[1px]  hover:border-orange-700 ease-in duration-100">
-                                              <FaShare
-                                                onClick={() => shareFn(it)}
-                                                className="text-bar self-baseline absolute top-2 right-1  text-sm  text-[#0275B1] hover:text-green-500 cursor-pointer "
-                                              />
+                                            
                                               <div className="flex gap-x-1 items-center w-[150px] mb-[8px]">
                                                 <image className="shadow-lg ">
                                                   <Image
@@ -1021,80 +937,6 @@ const Head = () => {
                                             </div>
                                           )}
                                       </div>
-
-                                      {shareFnd === it.messUid && (
-                                        <>
-                                          <div className="justify-center border-4 rounded-lg border-solid border-[#0E6795] items-center flex overflow-x-hidden fixed inset-0 z-50 outline-none focus:outline-none">
-                                            <div className="relative w-auto my-6 mx-auto max-w-3xl">
-                                              {/*content*/}
-                                              <div className="border-2 rounded-lg border-[#0E6795] shadow-xl dark:text-white relative flex flex-col w-[280px] h-[300px] bg-white outline-none focus:outline-none">
-                                                {/*header*/}
-
-                                                {/*body*/}
-                                                <div
-                                                  className="relative p-6 dark:bg-gray-700 flex-auto overflow-y-scroll scrollbar-red-500 "
-                                                  style={{
-                                                    scrollBehavior: "smooth",
-                                                    scrollbarColor: "green",
-                                                  }}
-                                                >
-                                                  {fndShow.map((tem) => (
-                                                    <div className="mb-3 border-b pb-[6px] w-[200px] border-black relative ">
-                                                      <div className="flex w-full gap-x-2 ">
-                                                        {tem.friendURL ? (
-                                                          <image>
-                                                            <Image
-                                                              className="w-[42px] h-[42px] rounded-full"
-                                                              imgSrc={
-                                                                tem.friendURL
-                                                              }
-                                                            />
-                                                          </image>
-                                                        ) : (
-                                                          <image>
-                                                            <Image
-                                                              className="w-[42px] h-[42px] rounded-full"
-                                                              imgSrc="assets/wx1.png"
-                                                            />
-                                                          </image>
-                                                        )}
-                                                        <div className="ml-1 w-[100px]">
-                                                          <h4 className="font-bar font-bold text-[12px]">
-                                                            {tem.friendName}
-                                                          </h4>
-                                                          <p className="font-bar font-semibold text-[10px] text-[#181818] dark:text-white">
-                                                            @ {tem.friendAbout}
-                                                          </p>
-                                                        </div>
-                                                      </div>
-                                                      <button
-                                                        onClick={() =>
-                                                          sendShare(tem)
-                                                        }
-                                                        className="absolute px-[3px] font-bar text-[10px] bg-slate-50 rounded-md right-0 top-2 font-semibold text-[#0E6795]"
-                                                      >
-                                                        Send
-                                                      </button>
-                                                    </div>
-                                                  ))}
-                                                </div>
-                                                {/*footer*/}
-                                                <div
-                                                  onClick={() =>
-                                                    setShareFnd("kkk")
-                                                  }
-                                                  className="flex items-center cursor-pointer justify-end p-2 border-t bg-slate-500 border-solid border-slate-200 rounded-b"
-                                                >
-                                                  <p className="font-bar font-semibold text-[10px] text-[#181818] dark:text-white">
-                                                    Cancel
-                                                  </p>
-                                                </div>
-                                              </div>
-                                            </div>
-                                          </div>
-                                          <div className="opacity-25 fixed inset-0 z-40 bg-black"></div>
-                                        </>
-                                      )}
                                     </>
                                   ))}
 

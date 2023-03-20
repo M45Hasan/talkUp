@@ -613,8 +613,8 @@ const Friends = () => {
                                       reduxReturnData.userStoreData.userInfo.uid
                                   ) ||
                                   fnShow.includes(
-                                    item.uid +
-                                      reduxReturnData.userStoreData.userInfo.uid
+                                   
+                                      reduxReturnData.userStoreData.userInfo.uid +item.uid
                                   ) ? (
                                   <button className="cursor-pointer px-[2px] bg-[#0E6795] text-white font-bar text-[12px] font-semibold rounded-[4px]">
                                     Friend
